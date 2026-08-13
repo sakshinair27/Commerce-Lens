@@ -1,0 +1,12 @@
+# No external dbt packages are required to run this project -- all generic
+# tests are hand-written in macros/ (see test_non_negative_number.sql) so
+# `dbt run` / `dbt test` work fully offline, with no `dbt deps` step.
+#
+# In an environment with normal internet access, dbt-labs/dbt_utils is a
+# natural addition (surrogate-key hashing, date-spine generation, more
+# generic tests) -- left commented out here rather than removed, so it's
+# obvious how to add it back:
+#
+# packages:
+#   - package: dbt-labs/dbt_utils
+#     version: [">=1.1.0", "<2.0.0"]
