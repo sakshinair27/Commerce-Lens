@@ -1,0 +1,140 @@
+CommerceLens SQL Project - Real Verification Run
+Run at: 2026-08-07 22:39:13
+PostgreSQL version: PostgreSQL 16.2 on x86_64-pc-linux-gnu, compiled by gcc (GCC) 10.2.1 20210130 (Red Hat 10.2.1-11), 64-bit
+
+Schema DDL applied: 01_raw_schema.sql, 02_warehouse_schema.sql, 03_triggers.sql, 04_procedures.sql
+
+=== Raw load ===
+raw.categories_raw: 24 rows loaded
+raw.customers_raw: 5025 rows loaded
+raw.products_raw: 500 rows loaded
+raw.orders_raw: 25000 rows loaded
+raw.order_items_raw: 74859 rows loaded
+raw.returns_raw: 12963 rows loaded
+
+ETL raw->warehouse completed in 27.30s
+
+=== Warehouse row counts ===
+warehouse.dim_customer: 5000 rows
+warehouse.dim_product: 500 rows
+warehouse.dim_category: 24 rows
+warehouse.dim_date: 1096 rows
+warehouse.fact_orders: 25000 rows
+warehouse.fact_order_items: 74859 rows
+warehouse.fact_returns: 12963 rows
+
+customer_summary refreshed via sp_refresh_customer_summary(): count=5000, avg_ltv=30732.95, max_ltv=124973.91
+
+=== Window function demo: top RFM segment counts ===
+('loyal', 1381)
+('champion', 1372)
+('at_risk', 1241)
+('lost', 969)
+
+=== Recursive CTE demo: category rollup ===
+('CAT-001', 'Electronics', 5, Decimal('8842357.73'), 38092)
+('CAT-014', 'Sports & Outdoors', 4, Decimal('7985060.34'), 34338)
+('CAT-021', 'Books', 4, Decimal('7427596.06'), 31536)
+('CAT-010', 'Apparel', 4, Decimal('6939572.97'), 29798)
+('CAT-006', 'Home & Kitchen', 4, Decimal('6627562.35'), 28299)
+('CAT-018', 'Beauty', 3, Decimal('5501252.99'), 23315)
+
+=== Optimization case study #1: single-customer order lookup, BEFORE index ===
+Sort  (cost=979.35..979.38 rows=10 width=31) (actual time=2.136..2.138 rows=10 loops=1)
+  Sort Key: dd.full_date DESC
+  Sort Method: quicksort  Memory: 25kB
+  ->  Hash Join  (cost=33.66..979.19 rows=10 width=31) (actual time=0.518..2.128 rows=10 loops=1)
+        Hash Cond: (fo.order_date_key = dd.date_key)
+        ->  Seq Scan on fact_orders fo  (cost=0.00..945.50 rows=10 width=31) (actual time=0.295..1.899 rows=10 loops=1)
+              Filter: (customer_key = 123)
+              Rows Removed by Filter: 24990
+        ->  Hash  (cost=19.96..19.96 rows=1096 width=8) (actual time=0.217..0.217 rows=1096 loops=1)
+              Buckets: 2048  Batches: 1  Memory Usage: 59kB
+              ->  Seq Scan on dim_date dd  (cost=0.00..19.96 rows=1096 width=8) (actual time=0.003..0.100 rows=1096 loops=1)
+Planning Time: 0.148 ms
+Execution Time: 2.155 ms
+
+=== Optimization case study #1: single-customer order lookup, AFTER index ===
+Sort  (cost=74.57..74.60 rows=10 width=31) (actual time=0.285..0.287 rows=10 loops=1)
+  Sort Key: dd.full_date DESC
+  Sort Method: quicksort  Memory: 25kB
+  ->  Hash Join  (cost=38.03..74.41 rows=10 width=31) (actual time=0.263..0.279 rows=10 loops=1)
+        Hash Cond: (fo.order_date_key = dd.date_key)
+        ->  Bitmap Heap Scan on fact_orders fo  (cost=4.37..40.72 rows=10 width=31) (actual time=0.039..0.050 rows=10 loops=1)
+              Recheck Cond: (customer_key = 123)
+              Heap Blocks: exact=10
+              ->  Bitmap Index Scan on idx_orders_customer_key  (cost=0.00..4.36 rows=10 width=0) (actual time=0.034..0.034 rows=10 loops=1)
+                    Index Cond: (customer_key = 123)
+        ->  Hash  (cost=19.96..19.96 rows=1096 width=8) (actual time=0.218..0.218 rows=1096 loops=1)
+              Buckets: 2048  Batches: 1  Memory Usage: 59kB
+              ->  Seq Scan on dim_date dd  (cost=0.00..19.96 rows=1096 width=8) (actual time=0.005..0.102 rows=1096 loops=1)
+Planning Time: 0.275 ms
+Execution Time: 0.314 ms
+
+=== Optimization case study #2: state x return-reason refund aggregate, BEFORE indexing ===
+Sort  (cost=3475.96..3476.08 rows=50 width=57) (actual time=31.319..31.328 rows=50 loops=1)
+  Sort Key: (sum(fr.refund_amount)) DESC
+  Sort Method: quicksort  Memory: 28kB
+  ->  HashAggregate  (cost=3473.92..3474.55 rows=50 width=57) (actual time=31.276..31.299 rows=50 loops=1)
+        Group Key: dc.state, fr.return_reason
+        Batches: 1  Memory Usage: 48kB
+        ->  Hash Join  (cost=2360.14..3413.36 rows=6056 width=23) (actual time=20.782..28.938 rows=5262 loops=1)
+              Hash Cond: (fo.customer_key = dc.customer_key)
+              ->  Hash Join  (cost=2164.64..3201.95 rows=6056 width=24) (actual time=19.582..26.313 rows=5262 loops=1)
+                    Hash Cond: (fo.order_key = foi.order_key)
+                    ->  Seq Scan on fact_orders fo  (cost=0.00..883.00 rows=25000 width=8) (actual time=0.118..2.336 rows=25000 loops=1)
+                    ->  Hash  (cost=2088.94..2088.94 rows=6056 width=24) (actual time=19.455..19.459 rows=5262 loops=1)
+                          Buckets: 8192  Batches: 1  Memory Usage: 365kB
+                          ->  Hash Join  (cost=375.07..2088.94 rows=6056 width=24) (actual time=3.962..18.333 rows=5262 loops=1)
+                                Hash Cond: (foi.order_item_key = fr.order_item_key)
+                                ->  Seq Scan on fact_order_items foi  (cost=0.00..1372.59 rows=74859 width=8) (actual time=0.002..5.483 rows=74859 loops=1)
+                                ->  Hash  (cost=299.37..299.37 rows=6056 width=24) (actual time=3.952..3.954 rows=5262 loops=1)
+                                      Buckets: 8192  Batches: 1  Memory Usage: 365kB
+                                      ->  Hash Join  (cost=34.58..299.37 rows=6056 width=24) (actual time=0.247..3.072 rows=5262 loops=1)
+                                            Hash Cond: (fr.return_date_key = dd.date_key)
+                                            ->  Seq Scan on fact_returns fr  (cost=0.00..230.63 rows=12963 width=28) (actual time=0.004..0.862 rows=12963 loops=1)
+                                            ->  Hash  (cost=28.18..28.18 rows=512 width=4) (actual time=0.239..0.240 rows=512 loops=1)
+                                                  Buckets: 1024  Batches: 1  Memory Usage: 26kB
+                                                  ->  Seq Scan on dim_date dd  (cost=0.00..28.18 rows=512 width=4) (actual time=0.098..0.185 rows=512 loops=1)
+                                                        Filter: (full_date >= (CURRENT_DATE - '1 year'::interval))
+                                                        Rows Removed by Filter: 584
+              ->  Hash  (cost=133.00..133.00 rows=5000 width=7) (actual time=1.191..1.192 rows=5000 loops=1)
+                    Buckets: 8192  Batches: 1  Memory Usage: 260kB
+                    ->  Seq Scan on dim_customer dc  (cost=0.00..133.00 rows=5000 width=7) (actual time=0.006..0.617 rows=5000 loops=1)
+Planning Time: 0.701 ms
+Execution Time: 31.384 ms
+
+=== Optimization case study #2: state x return-reason refund aggregate, AFTER indexing + ANALYZE ===
+Sort  (cost=3475.96..3476.08 rows=50 width=57) (actual time=36.032..36.041 rows=50 loops=1)
+  Sort Key: (sum(fr.refund_amount)) DESC
+  Sort Method: quicksort  Memory: 28kB
+  ->  HashAggregate  (cost=3473.92..3474.55 rows=50 width=57) (actual time=35.993..36.014 rows=50 loops=1)
+        Group Key: dc.state, fr.return_reason
+        Batches: 1  Memory Usage: 48kB
+        ->  Hash Join  (cost=2360.14..3413.36 rows=6056 width=23) (actual time=25.781..33.603 rows=5262 loops=1)
+              Hash Cond: (fo.customer_key = dc.customer_key)
+              ->  Hash Join  (cost=2164.64..3201.95 rows=6056 width=24) (actual time=24.121..30.617 rows=5262 loops=1)
+                    Hash Cond: (fo.order_key = foi.order_key)
+                    ->  Seq Scan on fact_orders fo  (cost=0.00..883.00 rows=25000 width=8) (actual time=0.143..2.334 rows=25000 loops=1)
+                    ->  Hash  (cost=2088.94..2088.94 rows=6056 width=24) (actual time=23.966..23.969 rows=5262 loops=1)
+                          Buckets: 8192  Batches: 1  Memory Usage: 365kB
+                          ->  Hash Join  (cost=375.07..2088.94 rows=6056 width=24) (actual time=5.000..22.666 rows=5262 loops=1)
+                                Hash Cond: (foi.order_item_key = fr.order_item_key)
+                                ->  Seq Scan on fact_order_items foi  (cost=0.00..1372.59 rows=74859 width=8) (actual time=0.003..6.883 rows=74859 loops=1)
+                                ->  Hash  (cost=299.37..299.37 rows=6056 width=24) (actual time=4.989..4.991 rows=5262 loops=1)
+                                      Buckets: 8192  Batches: 1  Memory Usage: 365kB
+                                      ->  Hash Join  (cost=34.58..299.37 rows=6056 width=24) (actual time=0.291..3.897 rows=5262 loops=1)
+                                            Hash Cond: (fr.return_date_key = dd.date_key)
+                                            ->  Seq Scan on fact_returns fr  (cost=0.00..230.63 rows=12963 width=28) (actual time=0.003..1.138 rows=12963 loops=1)
+                                            ->  Hash  (cost=28.18..28.18 rows=512 width=4) (actual time=0.284..0.285 rows=512 loops=1)
+                                                  Buckets: 1024  Batches: 1  Memory Usage: 26kB
+                                                  ->  Seq Scan on dim_date dd  (cost=0.00..28.18 rows=512 width=4) (actual time=0.101..0.213 rows=512 loops=1)
+                                                        Filter: (full_date >= (CURRENT_DATE - '1 year'::interval))
+                                                        Rows Removed by Filter: 584
+              ->  Hash  (cost=133.00..133.00 rows=5000 width=7) (actual time=1.651..1.651 rows=5000 loops=1)
+                    Buckets: 8192  Batches: 1  Memory Usage: 260kB
+                    ->  Seq Scan on dim_customer dc  (cost=0.00..133.00 rows=5000 width=7) (actual time=0.007..0.834 rows=5000 loops=1)
+Planning Time: 1.043 ms
+Execution Time: 36.101 ms
+
+Note: the aggregate query's plan is unchanged by indexing -- it touches most rows in fact_returns/fact_order_items/fact_orders, so Postgres correctly prefers hash joins + seq scans over index scans at this data volume. The point-lookup case study above (~1:5000 selectivity) is the fair test of index impact, and shows the expected Seq Scan -> Index Scan plan change.

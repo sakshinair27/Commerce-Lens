@@ -1,0 +1,233 @@
+CommerceLens dbt Project - Real Verification Run
+Run at: 2026-08-07 22:46:35
+
+
+=== dbt debug (exit=0, 5.6s) ===
+[0m02:46:39  Running with dbt=1.7.13
+[0m02:46:39  dbt version: 1.7.13
+[0m02:46:39  python version: 3.10.12
+[0m02:46:39  python path: /usr/bin/python
+[0m02:46:39  os info: Linux-6.8.0-124-generic-x86_64-with-glibc2.35
+[0m02:46:40  Using profiles dir at /tmp/commercelens_dbt_profiles
+[0m02:46:40  Using profiles.yml file at /tmp/commercelens_dbt_profiles/profiles.yml
+[0m02:46:40  Using dbt_project.yml file at /sessions/wonderful-focused-wright/mnt/outputs/commercelens-sql/dbt/commercelens/dbt_project.yml
+[0m02:46:40  adapter type: postgres
+[0m02:46:40  adapter version: 1.7.13
+[0m02:46:40  Configuration:
+[0m02:46:40    profiles.yml file [[32mOK found and valid[0m]
+[0m02:46:40    dbt_project.yml file [[32mOK found and valid[0m]
+[0m02:46:40  Required dependencies:
+[0m02:46:40   - git [[32mOK found[0m]
+
+[0m02:46:40  Connection:
+[0m02:46:40    host: /tmp/commercelens_pgdata
+[0m02:46:40    port: 5432
+[0m02:46:40    user: postgres
+[0m02:46:40    database: postgres
+[0m02:46:40    schema: dbt_dev
+[0m02:46:40    connect_timeout: 10
+[0m02:46:40    role: None
+[0m02:46:40    search_path: None
+[0m02:46:40    keepalives_idle: 0
+[0m02:46:40    sslmode: None
+[0m02:46:40    sslcert: None
+[0m02:46:40    sslkey: None
+[0m02:46:40    sslrootcert: None
+[0m02:46:40    application_name: dbt
+[0m02:46:40    retries: 1
+[0m02:46:40  Registered adapter: postgres=1.7.13
+[0m02:46:40    Connection test: [[32mOK connection ok[0m]
+
+[0m02:46:40  [32mAll checks passed![0m
+
+=== dbt run (exit=0, 25.6s) ===
+[0m02:46:45  Running with dbt=1.7.13
+[0m02:46:47  Registered adapter: postgres=1.7.13
+[0m02:46:47  Unable to do partial parsing because saved manifest not found. Starting full parse.
+[0m02:46:56  Found 20 models, 50 tests, 6 sources, 0 exposures, 0 metrics, 402 macros, 0 groups, 0 semantic models
+[0m02:46:56  
+[0m02:46:57  Concurrency: 4 threads (target='dev')
+[0m02:46:57  
+[0m02:46:57  1 of 20 START sql table model dbt_dev_marts.dim_date ........................... [RUN]
+[0m02:46:57  2 of 20 START sql view model dbt_dev_staging.stg_categories .................... [RUN]
+[0m02:46:57  3 of 20 START sql view model dbt_dev_staging.stg_customers ..................... [RUN]
+[0m02:46:57  4 of 20 START sql view model dbt_dev_staging.stg_order_items ................... [RUN]
+[0m02:46:58  1 of 20 OK created sql table model dbt_dev_marts.dim_date ...................... [[32mSELECT 1096[0m in 1.53s]
+[0m02:46:58  2 of 20 OK created sql view model dbt_dev_staging.stg_categories ............... [[32mCREATE VIEW[0m in 1.53s]
+[0m02:46:58  4 of 20 OK created sql view model dbt_dev_staging.stg_order_items .............. [[32mCREATE VIEW[0m in 1.53s]
+[0m02:46:58  3 of 20 OK created sql view model dbt_dev_staging.stg_customers ................ [[32mCREATE VIEW[0m in 1.58s]
+[0m02:46:58  5 of 20 START sql view model dbt_dev_staging.stg_orders ........................ [RUN]
+[0m02:46:58  6 of 20 START sql view model dbt_dev_staging.stg_products ...................... [RUN]
+[0m02:46:58  7 of 20 START sql view model dbt_dev_staging.stg_returns ....................... [RUN]
+[0m02:46:59  8 of 20 START sql table model dbt_dev_marts.dim_category ....................... [RUN]
+[0m02:46:59  7 of 20 OK created sql view model dbt_dev_staging.stg_returns .................. [[32mCREATE VIEW[0m in 0.83s]
+[0m02:46:59  5 of 20 OK created sql view model dbt_dev_staging.stg_orders ................... [[32mCREATE VIEW[0m in 0.86s]
+[0m02:46:59  6 of 20 OK created sql view model dbt_dev_staging.stg_products ................. [[32mCREATE VIEW[0m in 0.86s]
+[0m02:46:59  8 of 20 OK created sql table model dbt_dev_marts.dim_category .................. [[32mSELECT 24[0m in 0.82s]
+[0m02:46:59  9 of 20 START sql table model dbt_dev_marts.dim_customer ....................... [RUN]
+[0m02:46:59  10 of 20 START sql view model dbt_dev_intermediate.int_order_items_enriched .... [RUN]
+[0m02:46:59  11 of 20 START sql table model dbt_dev_marts.dim_product ....................... [RUN]
+[0m02:47:00  11 of 20 OK created sql table model dbt_dev_marts.dim_product .................. [[32mSELECT 500[0m in 0.84s]
+[0m02:47:00  10 of 20 OK created sql view model dbt_dev_intermediate.int_order_items_enriched  [[32mCREATE VIEW[0m in 0.87s]
+[0m02:47:00  9 of 20 OK created sql table model dbt_dev_marts.dim_customer .................. [[32mSELECT 5000[0m in 0.92s]
+[0m02:47:00  12 of 20 START sql view model dbt_dev_intermediate.int_order_totals ............ [RUN]
+[0m02:47:01  12 of 20 OK created sql view model dbt_dev_intermediate.int_order_totals ....... [[32mCREATE VIEW[0m in 0.24s]
+[0m02:47:01  13 of 20 START sql table model dbt_dev_marts.fct_orders ........................ [RUN]
+[0m02:47:01  14 of 20 START sql view model dbt_dev_intermediate.int_customer_order_facts .... [RUN]
+[0m02:47:01  14 of 20 OK created sql view model dbt_dev_intermediate.int_customer_order_facts  [[32mCREATE VIEW[0m in 0.40s]
+[0m02:47:01  15 of 20 START sql table model dbt_dev_marts.mart_customer_rfm ................. [RUN]
+[0m02:47:02  13 of 20 OK created sql table model dbt_dev_marts.fct_orders ................... [[32mSELECT 25000[0m in 1.17s]
+[0m02:47:02  16 of 20 START sql table model dbt_dev_marts.fct_order_items ................... [RUN]
+[0m02:47:02  17 of 20 START sql table model dbt_dev_marts.mart_cohort_retention ............. [RUN]
+[0m02:47:02  18 of 20 START sql table model dbt_dev_marts.mart_monthly_revenue_growth ....... [RUN]
+[0m02:47:02  15 of 20 OK created sql table model dbt_dev_marts.mart_customer_rfm ............ [[32mSELECT 4963[0m in 1.32s]
+[0m02:47:03  18 of 20 OK created sql table model dbt_dev_marts.mart_monthly_revenue_growth .. [[32mSELECT 31[0m in 0.91s]
+[0m02:47:03  17 of 20 OK created sql table model dbt_dev_marts.mart_cohort_retention ........ [[32mSELECT 651[0m in 0.99s]
+[0m02:47:04  16 of 20 OK created sql table model dbt_dev_marts.fct_order_items .............. [[32mSELECT 74859[0m in 2.14s]
+[0m02:47:04  19 of 20 START sql table model dbt_dev_marts.fct_returns ....................... [RUN]
+[0m02:47:04  20 of 20 START sql table model dbt_dev_marts.mart_category_sales_rollup ........ [RUN]
+[0m02:47:05  19 of 20 OK created sql table model dbt_dev_marts.fct_returns .................. [[32mSELECT 12963[0m in 0.62s]
+[0m02:47:05  20 of 20 OK created sql table model dbt_dev_marts.mart_category_sales_rollup ... [[32mSELECT 6[0m in 0.80s]
+[0m02:47:05  
+[0m02:47:05  Finished running 11 table models, 9 view models in 0 hours 0 minutes and 9.35 seconds (9.35s).
+[0m02:47:05  
+[0m02:47:05  [32mCompleted successfully[0m
+[0m02:47:05  
+[0m02:47:05  Done. PASS=20 WARN=0 ERROR=0 SKIP=0 TOTAL=20
+
+=== dbt test (exit=0, 23.6s) ===
+[0m02:47:13  Running with dbt=1.7.13
+[0m02:47:16  Registered adapter: postgres=1.7.13
+[0m02:47:18  Found 20 models, 50 tests, 6 sources, 0 exposures, 0 metrics, 402 macros, 0 groups, 0 semantic models
+[0m02:47:18  
+[0m02:47:18  Concurrency: 4 threads (target='dev')
+[0m02:47:18  
+[0m02:47:18  1 of 50 START test accepted_values_fct_orders_order_status__placed__shipped__delivered__cancelled__returned  [RUN]
+[0m02:47:18  2 of 50 START test accepted_values_mart_customer_rfm_segment__champion__loyal__at_risk__lost  [RUN]
+[0m02:47:18  3 of 50 START test accepted_values_stg_orders_order_status__placed__shipped__delivered__cancelled__returned  [RUN]
+[0m02:47:18  4 of 50 START test non_negative_number_stg_products_unit_price ................. [RUN]
+[0m02:47:19  2 of 50 PASS accepted_values_mart_customer_rfm_segment__champion__loyal__at_risk__lost  [[32mPASS[0m in 0.97s]
+[0m02:47:19  4 of 50 PASS non_negative_number_stg_products_unit_price ....................... [[32mPASS[0m in 0.97s]
+[0m02:47:19  1 of 50 PASS accepted_values_fct_orders_order_status__placed__shipped__delivered__cancelled__returned  [[32mPASS[0m in 1.00s]
+[0m02:47:19  3 of 50 PASS accepted_values_stg_orders_order_status__placed__shipped__delivered__cancelled__returned  [[32mPASS[0m in 1.00s]
+[0m02:47:19  5 of 50 START test not_null_dim_category_category_key .......................... [RUN]
+[0m02:47:19  6 of 50 START test not_null_dim_customer_customer_id ........................... [RUN]
+[0m02:47:19  7 of 50 START test not_null_dim_customer_customer_key .......................... [RUN]
+[0m02:47:19  8 of 50 START test not_null_dim_date_date_key .................................. [RUN]
+[0m02:47:20  6 of 50 PASS not_null_dim_customer_customer_id ................................. [[32mPASS[0m in 0.40s]
+[0m02:47:20  5 of 50 PASS not_null_dim_category_category_key ................................ [[32mPASS[0m in 0.43s]
+[0m02:47:20  9 of 50 START test not_null_dim_product_product_id ............................. [RUN]
+[0m02:47:20  8 of 50 PASS not_null_dim_date_date_key ........................................ [[32mPASS[0m in 0.45s]
+[0m02:47:20  10 of 50 START test not_null_dim_product_product_key ........................... [RUN]
+[0m02:47:20  7 of 50 PASS not_null_dim_customer_customer_key ................................ [[32mPASS[0m in 0.51s]
+[0m02:47:20  11 of 50 START test not_null_fct_order_items_order_item_key .................... [RUN]
+[0m02:47:20  12 of 50 START test not_null_fct_orders_order_key .............................. [RUN]
+[0m02:47:20  9 of 50 PASS not_null_dim_product_product_id ................................... [[32mPASS[0m in 0.70s]
+[0m02:47:20  10 of 50 PASS not_null_dim_product_product_key ................................. [[32mPASS[0m in 0.69s]
+[0m02:47:20  13 of 50 START test not_null_fct_returns_return_key ............................ [RUN]
+[0m02:47:20  11 of 50 PASS not_null_fct_order_items_order_item_key .......................... [[32mPASS[0m in 0.64s]
+[0m02:47:20  12 of 50 PASS not_null_fct_orders_order_key .................................... [[32mPASS[0m in 0.49s]
+[0m02:47:20  14 of 50 START test not_null_mart_category_sales_rollup_category_key ........... [RUN]
+[0m02:47:20  15 of 50 START test not_null_mart_customer_rfm_customer_key .................... [RUN]
+[0m02:47:20  16 of 50 START test not_null_mart_monthly_revenue_growth_order_month ........... [RUN]
+[0m02:47:21  13 of 50 PASS not_null_fct_returns_return_key .................................. [[32mPASS[0m in 0.52s]
+[0m02:47:21  14 of 50 PASS not_null_mart_category_sales_rollup_category_key ................. [[32mPASS[0m in 0.51s]
+[0m02:47:21  15 of 50 PASS not_null_mart_customer_rfm_customer_key .......................... [[32mPASS[0m in 0.50s]
+[0m02:47:21  17 of 50 START test not_null_stg_categories_category_id ........................ [RUN]
+[0m02:47:21  16 of 50 PASS not_null_mart_monthly_revenue_growth_order_month ................. [[32mPASS[0m in 0.52s]
+[0m02:47:21  18 of 50 START test not_null_stg_customers_customer_id ......................... [RUN]
+[0m02:47:21  19 of 50 START test not_null_stg_order_items_order_item_id ..................... [RUN]
+[0m02:47:21  20 of 50 START test not_null_stg_orders_order_id ............................... [RUN]
+[0m02:47:22  18 of 50 PASS not_null_stg_customers_customer_id ............................... [[32mPASS[0m in 0.77s]
+[0m02:47:22  20 of 50 PASS not_null_stg_orders_order_id ..................................... [[32mPASS[0m in 0.73s]
+[0m02:47:22  17 of 50 PASS not_null_stg_categories_category_id .............................. [[32mPASS[0m in 0.81s]
+[0m02:47:22  19 of 50 PASS not_null_stg_order_items_order_item_id ........................... [[32mPASS[0m in 0.76s]
+[0m02:47:22  21 of 50 START test not_null_stg_products_product_id ........................... [RUN]
+[0m02:47:22  22 of 50 START test not_null_stg_returns_return_id ............................. [RUN]
+[0m02:47:22  23 of 50 START test relationships_fct_order_items_order_key__order_key__ref_fct_orders_  [RUN]
+[0m02:47:22  24 of 50 START test relationships_fct_order_items_product_key__product_key__ref_dim_product_  [RUN]
+[0m02:47:23  21 of 50 PASS not_null_stg_products_product_id ................................. [[32mPASS[0m in 0.64s]
+[0m02:47:23  25 of 50 START test relationships_fct_orders_customer_key__customer_key__ref_dim_customer_  [RUN]
+[0m02:47:23  23 of 50 PASS relationships_fct_order_items_order_key__order_key__ref_fct_orders_  [[32mPASS[0m in 0.70s]
+[0m02:47:23  22 of 50 PASS not_null_stg_returns_return_id ................................... [[32mPASS[0m in 0.72s]
+[0m02:47:23  24 of 50 PASS relationships_fct_order_items_product_key__product_key__ref_dim_product_  [[32mPASS[0m in 0.70s]
+[0m02:47:23  26 of 50 START test relationships_fct_returns_order_item_key__order_item_key__ref_fct_order_items_  [RUN]
+[0m02:47:23  27 of 50 START test relationships_stg_order_items_order_id__order_id__ref_stg_orders_  [RUN]
+[0m02:47:23  28 of 50 START test relationships_stg_order_items_product_id__product_id__ref_stg_products_  [RUN]
+[0m02:47:24  25 of 50 PASS relationships_fct_orders_customer_key__customer_key__ref_dim_customer_  [[32mPASS[0m in 0.86s]
+[0m02:47:24  26 of 50 PASS relationships_fct_returns_order_item_key__order_item_key__ref_fct_order_items_  [[32mPASS[0m in 0.77s]
+[0m02:47:24  29 of 50 START test relationships_stg_orders_customer_id__customer_id__ref_stg_customers_  [RUN]
+[0m02:47:24  28 of 50 PASS relationships_stg_order_items_product_id__product_id__ref_stg_products_  [[32mPASS[0m in 0.77s]
+[0m02:47:24  30 of 50 START test relationships_stg_products_category_id__category_id__ref_stg_categories_  [RUN]
+[0m02:47:24  31 of 50 START test relationships_stg_returns_order_item_id__order_item_id__ref_stg_order_items_  [RUN]
+[0m02:47:24  27 of 50 PASS relationships_stg_order_items_order_id__order_id__ref_stg_orders_  [[32mPASS[0m in 0.93s]
+[0m02:47:24  32 of 50 START test unique_dim_category_category_key ........................... [RUN]
+[0m02:47:25  30 of 50 PASS relationships_stg_products_category_id__category_id__ref_stg_categories_  [[32mPASS[0m in 0.79s]
+[0m02:47:25  33 of 50 START test unique_dim_customer_customer_id ............................ [RUN]
+[0m02:47:25  29 of 50 PASS relationships_stg_orders_customer_id__customer_id__ref_stg_customers_  [[32mPASS[0m in 0.92s]
+[0m02:47:25  34 of 50 START test unique_dim_customer_customer_key ........................... [RUN]
+[0m02:47:25  31 of 50 PASS relationships_stg_returns_order_item_id__order_item_id__ref_stg_order_items_  [[32mPASS[0m in 0.94s]
+[0m02:47:25  32 of 50 PASS unique_dim_category_category_key ................................. [[32mPASS[0m in 0.80s]
+[0m02:47:25  35 of 50 START test unique_dim_date_date_key ................................... [RUN]
+[0m02:47:25  36 of 50 START test unique_dim_product_product_id .............................. [RUN]
+[0m02:47:25  33 of 50 PASS unique_dim_customer_customer_id .................................. [[32mPASS[0m in 0.91s]
+[0m02:47:26  37 of 50 START test unique_dim_product_product_key ............................. [RUN]
+[0m02:47:26  34 of 50 PASS unique_dim_customer_customer_key ................................. [[32mPASS[0m in 0.89s]
+[0m02:47:26  38 of 50 START test unique_fct_order_items_order_item_key ...................... [RUN]
+[0m02:47:26  35 of 50 PASS unique_dim_date_date_key ......................................... [[32mPASS[0m in 0.62s]
+[0m02:47:26  36 of 50 PASS unique_dim_product_product_id .................................... [[32mPASS[0m in 0.62s]
+[0m02:47:26  39 of 50 START test unique_fct_orders_order_key ................................ [RUN]
+[0m02:47:26  40 of 50 START test unique_fct_returns_return_key .............................. [RUN]
+[0m02:47:26  37 of 50 PASS unique_dim_product_product_key ................................... [[32mPASS[0m in 0.67s]
+[0m02:47:26  41 of 50 START test unique_mart_category_sales_rollup_category_key ............. [RUN]
+[0m02:47:27  38 of 50 PASS unique_fct_order_items_order_item_key ............................ [[32mPASS[0m in 0.73s]
+[0m02:47:27  39 of 50 PASS unique_fct_orders_order_key ...................................... [[32mPASS[0m in 0.65s]
+[0m02:47:27  42 of 50 START test unique_mart_customer_rfm_customer_key ...................... [RUN]
+[0m02:47:27  40 of 50 PASS unique_fct_returns_return_key .................................... [[32mPASS[0m in 0.63s]
+[0m02:47:27  43 of 50 START test unique_mart_monthly_revenue_growth_order_month ............. [RUN]
+[0m02:47:27  44 of 50 START test unique_stg_categories_category_id .......................... [RUN]
+[0m02:47:27  41 of 50 PASS unique_mart_category_sales_rollup_category_key ................... [[32mPASS[0m in 0.49s]
+[0m02:47:27  45 of 50 START test unique_stg_customers_customer_id ........................... [RUN]
+[0m02:47:27  42 of 50 PASS unique_mart_customer_rfm_customer_key ............................ [[32mPASS[0m in 0.68s]
+[0m02:47:27  43 of 50 PASS unique_mart_monthly_revenue_growth_order_month ................... [[32mPASS[0m in 0.71s]
+[0m02:47:27  46 of 50 START test unique_stg_customers_email ................................. [RUN]
+[0m02:47:27  44 of 50 PASS unique_stg_categories_category_id ................................ [[32mPASS[0m in 0.67s]
+[0m02:47:27  47 of 50 START test unique_stg_order_items_order_item_id ....................... [RUN]
+[0m02:47:28  48 of 50 START test unique_stg_orders_order_id ................................. [RUN]
+[0m02:47:28  45 of 50 PASS unique_stg_customers_customer_id ................................. [[32mPASS[0m in 0.56s]
+[0m02:47:28  49 of 50 START test unique_stg_products_product_id ............................. [RUN]
+[0m02:47:28  48 of 50 PASS unique_stg_orders_order_id ....................................... [[32mPASS[0m in 0.63s]
+[0m02:47:28  46 of 50 PASS unique_stg_customers_email ....................................... [[32mPASS[0m in 0.79s]
+[0m02:47:28  50 of 50 START test unique_stg_returns_return_id ............................... [RUN]
+[0m02:47:28  47 of 50 PASS unique_stg_order_items_order_item_id ............................. [[32mPASS[0m in 0.82s]
+[0m02:47:28  49 of 50 PASS unique_stg_products_product_id ................................... [[32mPASS[0m in 0.51s]
+[0m02:47:29  50 of 50 PASS unique_stg_returns_return_id ..................................... [[32mPASS[0m in 0.31s]
+[0m02:47:29  
+[0m02:47:29  Finished running 50 tests in 0 hours 0 minutes and 10.98 seconds (10.98s).
+[0m02:47:29  
+[0m02:47:29  [32mCompleted successfully[0m
+[0m02:47:29  
+[0m02:47:29  Done. PASS=50 WARN=0 ERROR=0 SKIP=0 TOTAL=50
+
+
+=== Sample: mart_customer_rfm segment counts ===
+('loyal', 1381)
+('champion', 1372)
+('at_risk', 1241)
+('lost', 969)
+
+=== Sample: mart_category_sales_rollup ===
+('Electronics', 5, Decimal('8842357.73'))
+('Sports & Outdoors', 4, Decimal('7985060.34'))
+('Books', 4, Decimal('7427596.06'))
+('Apparel', 4, Decimal('6939572.97'))
+('Home & Kitchen', 4, Decimal('6627562.35'))
+('Beauty', 3, Decimal('5501252.99'))
+
+=== Sample: mart_monthly_revenue_growth (last 6 rows) ===
+(datetime.date(2026, 7, 1), Decimal('1360937.62'), Decimal('1302059.97'), Decimal('4.52'))
+(datetime.date(2026, 6, 1), Decimal('1302059.97'), Decimal('1433196.02'), Decimal('-9.15'))
+(datetime.date(2026, 5, 1), Decimal('1433196.02'), Decimal('1351288.04'), Decimal('6.06'))
+(datetime.date(2026, 4, 1), Decimal('1351288.04'), Decimal('1428727.95'), Decimal('-5.42'))
+(datetime.date(2026, 3, 1), Decimal('1428727.95'), Decimal('1222528.10'), Decimal('16.87'))
+(datetime.date(2026, 2, 1), Decimal('1222528.10'), Decimal('1477256.08'), Decimal('-17.24'))
