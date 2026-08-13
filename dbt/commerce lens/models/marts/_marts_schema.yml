@@ -1,0 +1,97 @@
+version: 2
+
+models:
+  - name: dim_customer
+    description: One row per deduped customer, surrogate-keyed.
+    columns:
+      - name: customer_key
+        tests: [not_null, unique]
+      - name: customer_id
+        tests: [not_null, unique]
+
+  - name: dim_category
+    description: Product category dimension, self-referencing on parent_category_id.
+    columns:
+      - name: category_key
+        tests: [not_null, unique]
+
+  - name: dim_product
+    description: Product dimension enriched with its category name.
+    columns:
+      - name: product_key
+        tests: [not_null, unique]
+      - name: product_id
+        tests: [not_null, unique]
+
+  - name: dim_date
+    description: Calendar spine, 2024-01-01 through 2026-12-31.
+    columns:
+      - name: date_key
+        tests: [not_null, unique]
+
+  - name: fct_orders
+    description: One row per order at the order grain.
+    columns:
+      - name: order_key
+        tests: [not_null, unique]
+      - name: customer_key
+        tests:
+          - relationships:
+              to: ref('dim_customer')
+              field: customer_key
+      - name: order_status
+        tests:
+          - accepted_values:
+              values: ['placed', 'shipped', 'delivered', 'cancelled', 'returned']
+
+  - name: fct_order_items
+    description: One row per order line item.
+    columns:
+      - name: order_item_key
+        tests: [not_null, unique]
+      - name: order_key
+        tests:
+          - relationships:
+              to: ref('fct_orders')
+              field: order_key
+      - name: product_key
+        tests:
+          - relationships:
+              to: ref('dim_product')
+              field: product_key
+
+  - name: fct_returns
+    description: One row per return, tied to a specific order line item.
+    columns:
+      - name: return_key
+        tests: [not_null, unique]
+      - name: order_item_key
+        tests:
+          - relationships:
+              to: ref('fct_order_items')
+              field: order_item_key
+
+  - name: mart_customer_rfm
+    description: Recency/Frequency/Monetary quintile scoring and segment label per customer.
+    columns:
+      - name: customer_key
+        tests: [not_null, unique]
+      - name: segment
+        tests:
+          - accepted_values:
+              values: ['champion', 'loyal', 'at_risk', 'lost']
+
+  - name: mart_category_sales_rollup
+    description: Top-level category sales including all nested subcategories (recursive CTE).
+    columns:
+      - name: category_key
+        tests: [not_null, unique]
+
+  - name: mart_monthly_revenue_growth
+    description: Month-over-month revenue and % growth.
+    columns:
+      - name: order_month
+        tests: [not_null, unique]
+
+  - name: mart_cohort_retention
+    description: Signup-month cohort retention by months-since-signup.
