@@ -1,0 +1,16 @@
+version: 2
+
+sources:
+  - name: raw
+    description: >
+      Landing schema mirroring messy source-system exports (mixed date
+      formats, inconsistent casing, duplicate rows, unnormalized price
+      strings). Loaded via scripts/load_raw.py from the generated CSVs.
+    schema: raw
+    tables:
+      - name: customers_raw
+      - name: categories_raw
+      - name: products_raw
+      - name: orders_raw
+      - name: order_items_raw
+      - name: returns_raw
