@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.env
+data/*.csv
+dbt/commercelens/target/
+dbt/commercelens/dbt_packages/
+dbt/commercelens/logs/
+.DS_Store
+
+# results/*.txt is intentionally NOT ignored -- it's real captured output
+# from an actual run (row counts, ETL timing, EXPLAIN ANALYZE plans, dbt
+# test results), kept as evidence rather than regenerated docs.
