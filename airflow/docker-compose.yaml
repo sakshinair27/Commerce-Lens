@@ -1,0 +1,110 @@
+# Docker-based Airflow for CommerceLens local dev.
+#
+# Why this exists: Airflow doesn't run natively on Windows (it's POSIX-only
+# outside of WSL2/containers -- see the warning Airflow itself prints on a
+# native Windows venv). Since Postgres is already running via the repo
+# root's docker-compose.yml, this runs Airflow the same way: in Docker,
+# joined to that same Docker network, so the DAG's `warehouse_conn` can
+# reach Postgres by container name (`commercelens_pg`) instead of
+# `localhost`.
+#
+# LocalExecutor, not CeleryExecutor -- this is a single-machine dev setup,
+# not a production cluster, so the usual multi-worker/Redis/Flower stack
+# from Airflow's official quickstart compose file would be overkill here.
+#
+# Prerequisite: run `docker compose up -d postgres` from the REPO ROOT
+# first (not this directory), so `commercelens_pg` exists and the shared
+# network it creates exists for this file to join.
+#
+# IMPORTANT: verify the external network name below actually matches your
+# setup -- run `docker network ls` after starting the root compose file
+# and look for one ending in `_default`. If it's not literally
+# "commercelens-sql_default", change the `networks.default.name` value
+# below to match before running `docker compose up` here.
+
+x-airflow-common: &airflow-common
+  build: .
+  environment: &airflow-common-env
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@airflow-db/airflow
+    AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    AIRFLOW__API__AUTH_BACKENDS: "airflow.api.auth.backend.basic_auth"
+    # Docker Desktop on Windows typically gives containers fewer CPU/RAM
+    # resources than a native Linux host, so gunicorn's startup (loading
+    # Flask-AppBuilder + all providers) can miss Airflow's default
+    # 120-second health check. Raise the timeout and trim worker count so
+    # startup is lighter.
+    AIRFLOW__WEBSERVER__WEB_SERVER_MASTER_TIMEOUT: "300"
+    AIRFLOW__WEBSERVER__WEB_SERVER_WORKER_TIMEOUT: "300"
+    AIRFLOW__WEBSERVER__WORKERS: "2"
+    # These two make the DAG work with zero manual Airflow Variable setup
+    # inside the container -- AIRFLOW_VAR_<NAME> is how Airflow lets you
+    # set Variables via environment instead of the UI/CLI.
+    AIRFLOW_VAR_COMMERCELENS_REPO_DIR: /opt/airflow/project
+    AIRFLOW_VAR_COMMERCELENS_DBT_BIN: /opt/dbt_venv/bin/dbt
+  volumes:
+    - ./dags:/opt/airflow/dags
+    - airflow_logs:/opt/airflow/logs
+    # The whole repo, read-write (dbt needs to write its target/ dir, and
+    # load_raw.py only reads, but it's simplest to mount the project root
+    # once rather than mount dbt/, scripts/, dbt_profile/, data/ separately).
+    - ..:/opt/airflow/project
+  depends_on:
+    airflow-db:
+      condition: service_healthy
+
+services:
+  airflow-db:
+    image: postgres:16
+    container_name: commercelens_airflow_db
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - airflow_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U airflow"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  airflow-init:
+    <<: *airflow-common
+    container_name: commercelens_airflow_init
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        airflow db migrate
+        airflow users create \
+          --username admin --password admin \
+          --firstname Sakshi --lastname Nair \
+          --role Admin --email admin@example.com || true
+
+  airflow-webserver:
+    <<: *airflow-common
+    container_name: commercelens_airflow_webserver
+    command: webserver
+    ports:
+      - "8080:8080"
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-scheduler:
+    <<: *airflow-common
+    container_name: commercelens_airflow_scheduler
+    command: scheduler
+    depends_on:
+      airflow-init:
+        condition: service_completed_successfully
+
+volumes:
+  airflow_db_data:
+  airflow_logs:
+
+networks:
+  default:
+    name: commercelens-sql_default  # <-- verify with `docker network ls`, see note above
+    external: true

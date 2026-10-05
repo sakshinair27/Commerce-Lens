@@ -1,0 +1,50 @@
+# Machine-driven dbt profile for CommerceLens, used by the Airflow DAG
+# (airflow/dags/commercelens_dag.py) via `dbt --profiles-dir`.
+#
+# Every connection field comes from an env var the DAG sets just before
+# invoking dbt -- nothing here is hardcoded to Postgres or to any one
+# environment. Which block gets used is controlled by DBT_TARGET (also set
+# by the DAG, from an Airflow Variable), not by editing this file.
+#
+# This is deliberately a separate file from profiles_example.yml, which
+# stays as the plain, human-oriented template for local/manual dbt use
+# documented in the README. This file is the automation-facing one.
+#
+# Status: the `dev` (Postgres) target below is the one actually exercised
+# by the DAG today. The `snowflake` target is written out so the shape of
+# the eventual migration is explicit, but it has NOT been run against a
+# real Snowflake account -- there's no Snowflake instance in this project
+# yet. Migrating later means: stand up Snowflake, create a `warehouse_conn`
+# Airflow Connection of type Snowflake, fill in the DBT_SF_* env vars it
+# maps to (see commercelens_dag.py's _dbt_env_for_connection), and flip the
+# COMMERCELENS_DBT_TARGET Airflow Variable to "snowflake". No DAG code
+# changes, and this file doesn't change either -- the target block is
+# already here.
+
+commercelens:
+  target: "{{ env_var('DBT_TARGET', 'dev') }}"
+  outputs:
+
+    # Postgres -- real, tested, what the DAG runs against today.
+    dev:
+      type: postgres
+      host: "{{ env_var('DBT_PG_HOST') }}"
+      user: "{{ env_var('DBT_PG_USER') }}"
+      password: "{{ env_var('DBT_PG_PASSWORD', '') }}"
+      port: "{{ env_var('DBT_PG_PORT', '5432') | as_number }}"
+      dbname: "{{ env_var('DBT_PG_DBNAME') }}"
+      schema: "{{ env_var('DBT_PG_SCHEMA', 'dbt_dev') }}"
+      threads: 4
+
+    # Snowflake -- shape only, untested. Prepared so the migration is a
+    # connection + variable swap, not a rewrite.
+    snowflake:
+      type: snowflake
+      account: "{{ env_var('DBT_SF_ACCOUNT') }}"
+      user: "{{ env_var('DBT_SF_USER') }}"
+      password: "{{ env_var('DBT_SF_PASSWORD', '') }}"
+      role: "{{ env_var('DBT_SF_ROLE', '') }}"
+      database: "{{ env_var('DBT_SF_DATABASE') }}"
+      warehouse: "{{ env_var('DBT_SF_WAREHOUSE') }}"
+      schema: "{{ env_var('DBT_SF_SCHEMA', 'dbt_dev') }}"
+      threads: 4

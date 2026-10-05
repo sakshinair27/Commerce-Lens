@@ -1,0 +1,232 @@
+CommerceLens Airflow DAG commercelens_elt - real successful run
+Run ID: manual__2026-10-05T21:30:42.218667+00:00
+
+=== Task: ingest_raw_data ===
+[2026-10-05T21:30:44.043+0000] {local_task_job_runner.py:120} INFO - ::group::Pre task execution logs
+[2026-10-05T21:30:44.121+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: commercelens_elt.ingest_raw_data manual__2026-10-05T21:30:42.218667+00:00 [queued]>
+[2026-10-05T21:30:44.139+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: commercelens_elt.ingest_raw_data manual__2026-10-05T21:30:42.218667+00:00 [queued]>
+[2026-10-05T21:30:44.140+0000] {taskinstance.py:2306} INFO - Starting attempt 1 of 1
+[2026-10-05T21:30:44.178+0000] {taskinstance.py:2330} INFO - Executing <Task(PythonOperator): ingest_raw_data> on 2026-10-05 21:30:42.218667+00:00
+[2026-10-05T21:30:44.190+0000] {standard_task_runner.py:64} INFO - Started process 834 to run task
+[2026-10-05T21:30:44.206+0000] {standard_task_runner.py:90} INFO - Running: ['***', 'tasks', 'run', 'commercelens_elt', 'ingest_raw_data', 'manual__2026-10-05T21:30:42.218667+00:00', '--job-id', '10', '--raw', '--subdir', 'DAGS_FOLDER/commercelens_dag.py', '--cfg-path', '/tmp/tmpcgqeu153']
+[2026-10-05T21:30:44.213+0000] {standard_task_runner.py:91} INFO - Job 10: Subtask ingest_raw_data
+[2026-10-05T21:30:44.397+0000] {task_command.py:426} INFO - Running <TaskInstance: commercelens_elt.ingest_raw_data manual__2026-10-05T21:30:42.218667+00:00 [running]> on host 141013d5d57b
+[2026-10-05T21:30:44.669+0000] {taskinstance.py:2648} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='***' AIRFLOW_CTX_DAG_ID='commercelens_elt' AIRFLOW_CTX_TASK_ID='ingest_raw_data' AIRFLOW_CTX_EXECUTION_DATE='2026-10-05T21:30:42.218667+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2026-10-05T21:30:42.218667+00:00'
+[2026-10-05T21:30:44.670+0000] {taskinstance.py:430} INFO - ::endgroup::
+[2026-10-05T21:30:45.209+0000] {base.py:84} INFO - Using connection ID 'warehouse_conn' for task execution.
+[2026-10-05T21:30:45.344+0000] {logging_mixin.py:188} INFO - raw.categories_raw: 24 rows loaded
+[2026-10-05T21:30:45.837+0000] {logging_mixin.py:188} INFO - raw.customers_raw: 5025 rows loaded
+[2026-10-05T21:30:45.934+0000] {logging_mixin.py:188} INFO - raw.products_raw: 500 rows loaded
+[2026-10-05T21:30:46.938+0000] {logging_mixin.py:188} INFO - raw.orders_raw: 25000 rows loaded
+[2026-10-05T21:30:47.770+0000] {logging_mixin.py:188} INFO - raw.order_items_raw: 74859 rows loaded
+[2026-10-05T21:30:47.969+0000] {logging_mixin.py:188} INFO - raw.returns_raw: 12963 rows loaded
+[2026-10-05T21:30:47.971+0000] {python.py:237} INFO - Done. Returned value was: None
+[2026-10-05T21:30:47.973+0000] {taskinstance.py:441} INFO - ::group::Post task execution logs
+[2026-10-05T21:30:48.030+0000] {taskinstance.py:1206} INFO - Marking task as SUCCESS. dag_id=***_elt, task_id=ingest_raw_data, run_id=manual__2026-10-05T21:30:42.218667+00:00, execution_date=20261005T213042, start_date=20261005T213044, end_date=20261005T213048
+[2026-10-05T21:30:48.151+0000] {local_task_job_runner.py:243} INFO - Task exited with return code 0
+[2026-10-05T21:30:48.221+0000] {taskinstance.py:3503} INFO - 1 downstream tasks scheduled from follow-on schedule check
+[2026-10-05T21:30:48.224+0000] {local_task_job_runner.py:222} INFO - ::endgroup::
+
+=== Task: dbt_run ===
+[2026-10-05T21:30:50.017+0000] {local_task_job_runner.py:120} INFO - ::group::Pre task execution logs
+[2026-10-05T21:30:50.141+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: commercelens_elt.dbt_run manual__2026-10-05T21:30:42.218667+00:00 [queued]>
+[2026-10-05T21:30:50.174+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: commercelens_elt.dbt_run manual__2026-10-05T21:30:42.218667+00:00 [queued]>
+[2026-10-05T21:30:50.175+0000] {taskinstance.py:2306} INFO - Starting attempt 1 of 1
+[2026-10-05T21:30:50.213+0000] {taskinstance.py:2330} INFO - Executing <Task(PythonOperator): dbt_run> on 2026-10-05 21:30:42.218667+00:00
+[2026-10-05T21:30:50.224+0000] {standard_task_runner.py:64} INFO - Started process 841 to run task
+[2026-10-05T21:30:50.232+0000] {standard_task_runner.py:90} INFO - Running: ['***', 'tasks', 'run', 'commercelens_elt', 'dbt_run', 'manual__2026-10-05T21:30:42.218667+00:00', '--job-id', '11', '--raw', '--subdir', 'DAGS_FOLDER/commercelens_dag.py', '--cfg-path', '/tmp/tmp1xgjvwzd']
+[2026-10-05T21:30:50.236+0000] {standard_task_runner.py:91} INFO - Job 11: Subtask dbt_run
+[2026-10-05T21:30:50.353+0000] {task_command.py:426} INFO - Running <TaskInstance: commercelens_elt.dbt_run manual__2026-10-05T21:30:42.218667+00:00 [running]> on host 141013d5d57b
+[2026-10-05T21:30:50.566+0000] {taskinstance.py:2648} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='***' AIRFLOW_CTX_DAG_ID='commercelens_elt' AIRFLOW_CTX_TASK_ID='dbt_run' AIRFLOW_CTX_EXECUTION_DATE='2026-10-05T21:30:42.218667+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2026-10-05T21:30:42.218667+00:00'
+[2026-10-05T21:30:50.568+0000] {taskinstance.py:430} INFO - ::endgroup::
+[2026-10-05T21:30:50.921+0000] {base.py:84} INFO - Using connection ID 'warehouse_conn' for task execution.
+[2026-10-05T21:31:10.372+0000] {logging_mixin.py:188} INFO - 21:30:56  Running with dbt=1.12.5
+21:30:57  Registered adapter: postgres=1.11.0
+21:30:59  Found 20 models, 50 data tests, 6 sources, 478 macros
+21:30:59  
+21:30:59  Concurrency: 4 threads (target='dev')
+21:30:59  
+21:31:00  1 of 20 START sql table model dbt_dev_marts.dim_date ........................... [RUN]
+21:31:00  2 of 20 START sql view model dbt_dev_staging.stg_categories .................... [RUN]
+21:31:00  3 of 20 START sql view model dbt_dev_staging.stg_customers ..................... [RUN]
+21:31:00  4 of 20 START sql view model dbt_dev_staging.stg_order_items ................... [RUN]
+21:31:00  2 of 20 OK created sql view model dbt_dev_staging.stg_categories ............... [CREATE VIEW in 0.69s]
+21:31:00  3 of 20 OK created sql view model dbt_dev_staging.stg_customers ................ [CREATE VIEW in 0.69s]
+21:31:00  4 of 20 OK created sql view model dbt_dev_staging.stg_order_items .............. [CREATE VIEW in 0.62s]
+21:31:00  5 of 20 START sql view model dbt_dev_staging.stg_orders ........................ [RUN]
+21:31:00  6 of 20 START sql view model dbt_dev_staging.stg_products ...................... [RUN]
+21:31:00  7 of 20 START sql view model dbt_dev_staging.stg_returns ....................... [RUN]
+21:31:01  1 of 20 OK created sql table model dbt_dev_marts.dim_date ...................... [SELECT 1096 in 1.28s]
+21:31:01  8 of 20 START sql table model dbt_dev_marts.dim_category ....................... [RUN]
+21:31:01  7 of 20 OK created sql view model dbt_dev_staging.stg_returns .................. [CREATE VIEW in 0.58s]
+21:31:01  6 of 20 OK created sql view model dbt_dev_staging.stg_products ................. [CREATE VIEW in 0.59s]
+21:31:01  5 of 20 OK created sql view model dbt_dev_staging.stg_orders ................... [CREATE VIEW in 0.61s]
+21:31:01  9 of 20 START sql table model dbt_dev_marts.dim_customer ....................... [RUN]
+21:31:01  10 of 20 START sql view model dbt_dev_intermediate.int_order_items_enriched .... [RUN]
+21:31:02  8 of 20 OK created sql table model dbt_dev_marts.dim_category .................. [SELECT 24 in 0.78s]
+21:31:02  11 of 20 START sql table model dbt_dev_marts.dim_product ....................... [RUN]
+21:31:02  10 of 20 OK created sql view model dbt_dev_intermediate.int_order_items_enriched  [CREATE VIEW in 0.78s]
+21:31:02  12 of 20 START sql view model dbt_dev_intermediate.int_order_totals ............ [RUN]
+21:31:02  9 of 20 OK created sql table model dbt_dev_marts.dim_customer .................. [SELECT 5000 in 1.07s]
+21:31:02  11 of 20 OK created sql table model dbt_dev_marts.dim_product .................. [SELECT 500 in 0.52s]
+21:31:02  12 of 20 OK created sql view model dbt_dev_intermediate.int_order_totals ....... [CREATE VIEW in 0.47s]
+21:31:02  13 of 20 START sql table model dbt_dev_marts.fct_orders ........................ [RUN]
+21:31:02  14 of 20 START sql view model dbt_dev_intermediate.int_customer_order_facts .... [RUN]
+21:31:03  14 of 20 OK created sql view model dbt_dev_intermediate.int_customer_order_facts  [CREATE VIEW in 0.31s]
+21:31:03  15 of 20 START sql table model dbt_dev_marts.mart_customer_rfm ................. [RUN]
+21:31:04  13 of 20 OK created sql table model dbt_dev_marts.fct_orders ................... [SELECT 25000 in 1.24s]
+21:31:04  16 of 20 START sql table model dbt_dev_marts.fct_order_items ................... [RUN]
+21:31:04  17 of 20 START sql table model dbt_dev_marts.mart_cohort_retention ............. [RUN]
+21:31:04  18 of 20 START sql table model dbt_dev_marts.mart_monthly_revenue_growth ....... [RUN]
+21:31:04  15 of 20 OK created sql table model dbt_dev_marts.mart_customer_rfm ............ [SELECT 4963 in 0.99s]
+21:31:04  18 of 20 OK created sql table model dbt_dev_marts.mart_monthly_revenue_growth .. [SELECT 31 in 0.37s]
+21:31:04  17 of 20 OK created sql table model dbt_dev_marts.mart_cohort_retention ........ [SELECT 651 in 0.48s]
+21:31:06  16 of 20 OK created sql table model dbt_dev_marts.fct_order_items .............. [SELECT 74859 in 2.46s]
+21:31:06  19 of 20 START sql table model dbt_dev_marts.fct_returns ....................... [RUN]
+21:31:06  20 of 20 START sql table model dbt_dev_marts.mart_category_sales_rollup ........ [RUN]
+21:31:07  19 of 20 OK created sql table model dbt_dev_marts.fct_returns .................. [SELECT 12963 in 1.16s]
+21:31:07  20 of 20 OK created sql table model dbt_dev_marts.mart_category_sales_rollup ... [SELECT 6 in 1.26s]
+21:31:08  
+21:31:08  Finished running 11 table models, 9 view models in 0 hours 0 minutes and 8.52 seconds (8.52s).
+21:31:08  
+21:31:08  Completed successfully
+21:31:08  
+21:31:08  Done. PASS=20 WARN=0 ERROR=0 SKIP=0 NO-OP=0 REUSED=0 TOTAL=20
+[2026-10-05T21:31:10.374+0000] {python.py:237} INFO - Done. Returned value was: None
+[2026-10-05T21:31:10.374+0000] {taskinstance.py:441} INFO - ::group::Post task execution logs
+[2026-10-05T21:31:10.407+0000] {taskinstance.py:1206} INFO - Marking task as SUCCESS. dag_id=***_elt, task_id=dbt_run, run_id=manual__2026-10-05T21:30:42.218667+00:00, execution_date=20261005T213042, start_date=20261005T213050, end_date=20261005T213110
+[2026-10-05T21:31:10.458+0000] {local_task_job_runner.py:243} INFO - Task exited with return code 0
+[2026-10-05T21:31:10.520+0000] {taskinstance.py:3503} INFO - 1 downstream tasks scheduled from follow-on schedule check
+[2026-10-05T21:31:10.525+0000] {local_task_job_runner.py:222} INFO - ::endgroup::
+
+=== Task: dbt_test ===
+[2026-10-05T21:31:12.357+0000] {local_task_job_runner.py:120} INFO - ::group::Pre task execution logs
+[2026-10-05T21:31:12.503+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: commercelens_elt.dbt_test manual__2026-10-05T21:30:42.218667+00:00 [queued]>
+[2026-10-05T21:31:12.540+0000] {taskinstance.py:2076} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: commercelens_elt.dbt_test manual__2026-10-05T21:30:42.218667+00:00 [queued]>
+[2026-10-05T21:31:12.541+0000] {taskinstance.py:2306} INFO - Starting attempt 1 of 1
+[2026-10-05T21:31:12.592+0000] {taskinstance.py:2330} INFO - Executing <Task(PythonOperator): dbt_test> on 2026-10-05 21:30:42.218667+00:00
+[2026-10-05T21:31:12.605+0000] {standard_task_runner.py:64} INFO - Started process 859 to run task
+[2026-10-05T21:31:12.614+0000] {standard_task_runner.py:90} INFO - Running: ['***', 'tasks', 'run', 'commercelens_elt', 'dbt_test', 'manual__2026-10-05T21:30:42.218667+00:00', '--job-id', '12', '--raw', '--subdir', 'DAGS_FOLDER/commercelens_dag.py', '--cfg-path', '/tmp/tmpo7r8g4va']
+[2026-10-05T21:31:12.618+0000] {standard_task_runner.py:91} INFO - Job 12: Subtask dbt_test
+[2026-10-05T21:31:12.784+0000] {task_command.py:426} INFO - Running <TaskInstance: commercelens_elt.dbt_test manual__2026-10-05T21:30:42.218667+00:00 [running]> on host 141013d5d57b
+[2026-10-05T21:31:13.009+0000] {taskinstance.py:2648} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='***' AIRFLOW_CTX_DAG_ID='commercelens_elt' AIRFLOW_CTX_TASK_ID='dbt_test' AIRFLOW_CTX_EXECUTION_DATE='2026-10-05T21:30:42.218667+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2026-10-05T21:30:42.218667+00:00'
+[2026-10-05T21:31:13.010+0000] {taskinstance.py:430} INFO - ::endgroup::
+[2026-10-05T21:31:13.576+0000] {base.py:84} INFO - Using connection ID 'warehouse_conn' for task execution.
+[2026-10-05T21:31:37.724+0000] {logging_mixin.py:188} INFO - 21:31:19  Running with dbt=1.12.5
+21:31:20  Registered adapter: postgres=1.11.0
+21:31:22  Found 20 models, 50 data tests, 6 sources, 478 macros
+21:31:22  
+21:31:22  Concurrency: 4 threads (target='dev')
+21:31:22  
+21:31:23  1 of 50 START test accepted_values_fct_orders_order_status__placed__shipped__delivered__cancelled__returned  [RUN]
+21:31:23  2 of 50 START test accepted_values_mart_customer_rfm_segment__champion__loyal__at_risk__lost  [RUN]
+21:31:23  3 of 50 START test accepted_values_stg_orders_order_status__placed__shipped__delivered__cancelled__returned  [RUN]
+21:31:23  4 of 50 START test non_negative_number_stg_products_unit_price ................. [RUN]
+21:31:23  4 of 50 PASS non_negative_number_stg_products_unit_price ....................... [PASS in 0.57s]
+21:31:23  5 of 50 START test not_null_dim_category_category_key .......................... [RUN]
+21:31:23  1 of 50 PASS accepted_values_fct_orders_order_status__placed__shipped__delivered__cancelled__returned  [PASS in 0.63s]
+21:31:24  6 of 50 START test not_null_dim_customer_customer_id ........................... [RUN]
+21:31:24  2 of 50 PASS accepted_values_mart_customer_rfm_segment__champion__loyal__at_risk__lost  [PASS in 0.70s]
+21:31:24  7 of 50 START test not_null_dim_customer_customer_key .......................... [RUN]
+21:31:24  3 of 50 PASS accepted_values_stg_orders_order_status__placed__shipped__delivered__cancelled__returned  [PASS in 0.81s]
+21:31:24  8 of 50 START test not_null_dim_date_date_key .................................. [RUN]
+21:31:24  5 of 50 PASS not_null_dim_category_category_key ................................ [PASS in 0.43s]
+21:31:24  7 of 50 PASS not_null_dim_customer_customer_key ................................ [PASS in 0.30s]
+21:31:24  9 of 50 START test not_null_dim_product_product_id ............................. [RUN]
+21:31:24  6 of 50 PASS not_null_dim_customer_customer_id ................................. [PASS in 0.37s]
+21:31:24  10 of 50 START test not_null_dim_product_product_key ........................... [RUN]
+21:31:24  11 of 50 START test not_null_fct_order_items_order_item_key .................... [RUN]
+21:31:24  8 of 50 PASS not_null_dim_date_date_key ........................................ [PASS in 0.38s]
+21:31:24  12 of 50 START test not_null_fct_orders_order_key .............................. [RUN]
+21:31:24  9 of 50 PASS not_null_dim_product_product_id ................................... [PASS in 0.44s]
+21:31:24  10 of 50 PASS not_null_dim_product_product_key ................................. [PASS in 0.43s]
+21:31:24  13 of 50 START test not_null_fct_returns_return_key ............................ [RUN]
+21:31:24  14 of 50 START test not_null_mart_category_sales_rollup_category_key ........... [RUN]
+21:31:25  11 of 50 PASS not_null_fct_order_items_order_item_key .......................... [PASS in 0.60s]
+21:31:25  15 of 50 START test not_null_mart_customer_rfm_customer_key .................... [RUN]
+21:31:25  12 of 50 PASS not_null_fct_orders_order_key .................................... [PASS in 0.65s]
+21:31:25  16 of 50 START test not_null_mart_monthly_revenue_growth_order_month ........... [RUN]
+21:31:25  13 of 50 PASS not_null_fct_returns_return_key .................................. [PASS in 0.67s]
+21:31:25  17 of 50 START test not_null_stg_categories_category_id ........................ [RUN]
+21:31:26  14 of 50 PASS not_null_mart_category_sales_rollup_category_key ................. [PASS in 1.15s]
+21:31:26  18 of 50 START test not_null_stg_customers_customer_id ......................... [RUN]
+21:31:26  15 of 50 PASS not_null_mart_customer_rfm_customer_key .......................... [PASS in 1.34s]
+21:31:26  16 of 50 PASS not_null_mart_monthly_revenue_growth_order_month ................. [PASS in 1.30s]
+21:31:26  19 of 50 START test not_null_stg_order_items_order_item_id ..................... [RUN]
+21:31:26  20 of 50 START test not_null_stg_orders_order_id ............................... [RUN]
+21:31:27  17 of 50 PASS not_null_stg_categories_category_id .............................. [PASS in 1.12s]
+21:31:27  21 of 50 START test not_null_stg_products_product_id ........................... [RUN]
+21:31:27  18 of 50 PASS not_null_stg_customers_customer_id ............................... [PASS in 1.40s]
+21:31:27  22 of 50 START test not_null_stg_returns_return_id ............................. [RUN]
+21:31:28  20 of 50 PASS not_null_stg_orders_order_id ..................................... [PASS in 1.21s]
+21:31:28  23 of 50 START test relationships_fct_order_items_order_key__order_key__ref_fct_orders_  [RUN]
+21:31:28  19 of 50 PASS not_null_stg_order_items_order_item_id ........................... [PASS in 1.46s]
+21:31:28  24 of 50 START test relationships_fct_order_items_product_key__product_key__ref_dim_product_  [RUN]
+21:31:28  21 of 50 PASS not_null_stg_products_product_id ................................. [PASS in 0.95s]
+21:31:28  22 of 50 PASS not_null_stg_returns_return_id ................................... [PASS in 0.42s]
+21:31:28  25 of 50 START test relationships_fct_orders_customer_key__customer_key__ref_dim_customer_  [RUN]
+21:31:28  26 of 50 START test relationships_fct_returns_order_item_key__order_item_key__ref_fct_order_items_  [RUN]
+21:31:28  23 of 50 PASS relationships_fct_order_items_order_key__order_key__ref_fct_orders_  [PASS in 0.42s]
+21:31:28  27 of 50 START test relationships_stg_order_items_order_id__order_id__ref_stg_orders_  [RUN]
+21:31:28  25 of 50 PASS relationships_fct_orders_customer_key__customer_key__ref_dim_customer_  [PASS in 0.32s]
+21:31:28  24 of 50 PASS relationships_fct_order_items_product_key__product_key__ref_dim_product_  [PASS in 0.45s]
+21:31:28  28 of 50 START test relationships_stg_order_items_product_id__product_id__ref_stg_products_  [RUN]
+21:31:28  29 of 50 START test relationships_stg_orders_customer_id__customer_id__ref_stg_customers_  [RUN]
+21:31:28  26 of 50 PASS relationships_fct_returns_order_item_key__order_item_key__ref_fct_order_items_  [PASS in 0.43s]
+21:31:28  30 of 50 START test relationships_stg_products_category_id__category_id__ref_stg_categories_  [RUN]
+21:31:28  27 of 50 PASS relationships_stg_order_items_order_id__order_id__ref_stg_orders_  [PASS in 0.37s]
+21:31:28  31 of 50 START test relationships_stg_returns_order_item_id__order_item_id__ref_stg_order_items_  [RUN]
+21:31:29  28 of 50 PASS relationships_stg_order_items_product_id__product_id__ref_stg_products_  [PASS in 0.32s]
+21:31:29  32 of 50 START test unique_dim_category_category_key ........................... [RUN]
+21:31:29  30 of 50 PASS relationships_stg_products_category_id__category_id__ref_stg_categories_  [PASS in 0.42s]
+21:31:29  31 of 50 PASS relationships_stg_returns_order_item_id__order_item_id__ref_stg_order_items_  [PASS in 0.40s]
+21:31:29  29 of 50 PASS relationships_stg_orders_customer_id__customer_id__ref_stg_customers_  [PASS in 0.62s]
+21:31:29  33 of 50 START test unique_dim_customer_customer_id ............................ [RUN]
+21:31:29  34 of 50 START test unique_dim_customer_customer_key ........................... [RUN]
+21:31:29  35 of 50 START test unique_dim_date_date_key ................................... [RUN]
+21:31:29  32 of 50 PASS unique_dim_category_category_key ................................. [PASS in 0.84s]
+21:31:29  36 of 50 START test unique_dim_product_product_id .............................. [RUN]
+21:31:30  35 of 50 PASS unique_dim_date_date_key ......................................... [PASS in 0.37s]
+21:31:30  33 of 50 PASS unique_dim_customer_customer_id .................................. [PASS in 0.54s]
+21:31:30  37 of 50 START test unique_dim_product_product_key ............................. [RUN]
+21:31:30  34 of 50 PASS unique_dim_customer_customer_key ................................. [PASS in 0.43s]
+21:31:30  38 of 50 START test unique_fct_order_items_order_item_key ...................... [RUN]
+21:31:30  39 of 50 START test unique_fct_orders_order_key ................................ [RUN]
+21:31:30  36 of 50 PASS unique_dim_product_product_id .................................... [PASS in 0.57s]
+21:31:30  37 of 50 PASS unique_dim_product_product_key ................................... [PASS in 0.46s]
+21:31:30  40 of 50 START test unique_fct_returns_return_key .............................. [RUN]
+21:31:30  41 of 50 START test unique_mart_category_sales_rollup_category_key ............. [RUN]
+21:31:30  38 of 50 PASS unique_fct_order_items_order_item_key ............................ [PASS in 0.61s]
+21:31:30  42 of 50 START test unique_mart_customer_rfm_customer_key ...................... [RUN]
+21:31:31  39 of 50 PASS unique_fct_orders_order_key ...................................... [PASS in 0.68s]
+21:31:31  43 of 50 START test unique_mart_monthly_revenue_growth_order_month ............. [RUN]
+21:31:31  41 of 50 PASS unique_mart_category_sales_rollup_category_key ................... [PASS in 0.78s]
+21:31:31  40 of 50 PASS unique_fct_returns_return_key .................................... [PASS in 0.99s]
+21:31:31  42 of 50 PASS unique_mart_customer_rfm_customer_key ............................ [PASS in 0.97s]
+21:31:32  44 of 50 START test unique_stg_categories_category_id .......................... [RUN]
+21:31:32  45 of 50 START test unique_stg_customers_customer_id ........................... [RUN]
+21:31:32  46 of 50 START test unique_stg_customers_email ................................. [RUN]
+21:31:32  43 of 50 PASS unique_mart_monthly_revenue_growth_order_month ................... [PASS in 1.53s]
+21:31:32  47 of 50 START test unique_stg_order_items_order_item_id ....................... [RUN]
+21:31:32  44 of 50 PASS unique_stg_categories_category_id ................................ [PASS in 0.83s]
+21:31:33  48 of 50 START test unique_stg_orders_order_id ................................. [RUN]
+21:31:33  45 of 50 PASS unique_stg_customers_customer_id ................................. [PASS in 1.06s]
+21:31:33  46 of 50 PASS unique_stg_customers_email ....................................... [PASS in 0.97s]
+21:31:33  49 of 50 START test unique_stg_products_product_id ............................. [RUN]
+21:31:33  50 of 50 START test unique_stg_returns_return_id ............................... [RUN]
+21:31:34  47 of 50 PASS unique_stg_order_items_order_item_id ............................. [PASS in 1.39s]
+21:31:34  49 of 50 PASS unique_stg_products_product_id ................................... [PASS in 0.65s]
+21:31:34  48 of 50 PASS unique_stg_orders_order_id ....................................... [PASS in 1.20s]
+21:31:34  50 of 50 PASS unique_stg_returns_return_id ..................................... [PASS in 0.66s]
+21:31:34  
+21:31:34  Finished running 50 data tests in 0 hours 0 minutes and 11.53 seconds (11.53s).
+21:31:35  
+21:31:35  Completed successfully
+21:31:35  
+21:31:35  Done. PASS=50 WARN=0 ERROR=0 SKIP=0 NO-OP=0 REUSED=0 TOTAL=50
+[2026-10-05T21:31:37.726+0000] {python.py:237} INFO - Done. Returned value was: None
+[2026-10-05T21:31:37.727+0000] {taskinstance.py:441} INFO - ::group::Post task execution logs
+[2026-10-05T21:31:37.774+0000] {taskinstance.py:1206} INFO - Marking task as SUCCESS. dag_id=***_elt, task_id=dbt_test, run_id=manual__2026-10-05T21:30:42.218667+00:00, execution_date=20261005T213042, start_date=20261005T213112, end_date=20261005T213137
+[2026-10-05T21:31:37.841+0000] {local_task_job_runner.py:243} INFO - Task exited with return code 0
+[2026-10-05T21:31:37.873+0000] {taskinstance.py:3503} INFO - 0 downstream tasks scheduled from follow-on schedule check
+[2026-10-05T21:31:37.876+0000] {local_task_job_runner.py:222} INFO - ::endgroup::
