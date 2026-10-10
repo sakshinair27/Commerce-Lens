@@ -4,7 +4,8 @@ An end-to-end, advanced-SQL-driven data warehouse project built on a
 realistically messy synthetic e-commerce dataset. Real PostgreSQL (not
 SQLite), a hand-written SQL ETL and an equivalent dbt project side by
 side, PL/pgSQL triggers/procedures, a real query-optimization case study,
-and a Dockerized BI layer.
+a Dockerized BI layer, and an Airflow DAG orchestrating the dbt pipeline
+end to end.
 
 Every number in this README is real, captured from an actual run against a
 live Postgres 16 instance -- see `results/verification_output.txt` and
@@ -21,6 +22,7 @@ live Postgres 16 instance -- see `results/verification_output.txt` and
 | `sql/advanced/` | Window functions (RFM, MoM growth, cohort retention), a recursive CTE |
 | `sql/optimization/case_study.sql` | Real `EXPLAIN ANALYZE` before/after indexing |
 | `dbt/commercelens/` | The same transformation rebuilt as staging/intermediate/marts, with 50 tests |
+| `airflow/` | Apache Airflow DAG orchestrating ingestion -> `dbt run` -> `dbt test`, warehouse config-driven (Postgres today, Snowflake-ready) -- see `airflow/README.md` for the real, verified run |
 | `docker-compose.yml` + `docker/init/` | One-command Postgres + Metabase, auto-seeded |
 | `bi/metabase_setup.md` | Dashboard setup on the Dockerized BI layer |
 
@@ -59,6 +61,11 @@ pip install dbt-postgres
 dbt run && dbt test
 ```
 
+To run the same pipeline orchestrated end to end with Airflow instead of
+calling dbt by hand, see `airflow/README.md` -- it covers Docker-based
+setup on Windows/Linux/macOS and documents a real verified run (20/20
+models, 50/50 tests, on a live scheduler).
+
 ## Real results (from `results/verification_output.txt`)
 
 **ETL**: raw CSVs load with exact row-count parity (24 / 5,025 / 500 /
@@ -96,6 +103,17 @@ no `dbt deps` network call). Output parity confirmed against the
 hand-written SQL ETL -- e.g. `mart_customer_rfm` produces the identical
 1,381 / 1,372 / 1,241 / 969 segment split.
 
+## Orchestration (from `results/airflow_dag_run_output.txt`)
+
+The dbt pipeline above is also orchestrated as an Airflow DAG
+(`airflow/dags/commercelens_dag.py`): `ingest_raw_data` -> `dbt_run` ->
+`dbt_test`, with the warehouse behind an Airflow connection so the DAG
+itself doesn't change when migrating from Postgres to Snowflake later.
+Deployed with Docker and run end to end against a live scheduler -- all
+three tasks succeeded, 20/20 models built, 50/50 tests passed. Full task
+logs captured in `results/airflow_dag_run_output.txt`; setup steps and
+what's verified vs. not are in `airflow/README.md`.
+
 ## A real bug this project caught
 
 `trg_enforce_return_has_record` (a PL/pgSQL trigger requiring any order
@@ -119,6 +137,8 @@ commercelens-sql/
     advanced/             window functions, recursive CTE
     optimization/         EXPLAIN ANALYZE case study
   dbt/commercelens/       staging / intermediate / marts, schema tests
+  dbt_profile/            machine-facing dbt profile used by the Airflow DAG
+  airflow/                Airflow DAG, Dockerfile, docker-compose, README
   scripts/                data generation, raw load, verification runners
   docker/init/            Postgres auto-seed script
   bi/                     Metabase setup + suggested dashboards
