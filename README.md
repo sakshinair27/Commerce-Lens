@@ -4,8 +4,8 @@ An end-to-end, advanced-SQL-driven data warehouse project built on a
 realistically messy synthetic e-commerce dataset. Real PostgreSQL (not
 SQLite), a hand-written SQL ETL and an equivalent dbt project side by
 side, PL/pgSQL triggers/procedures, a real query-optimization case study,
-a Dockerized BI layer, and an Airflow DAG orchestrating the dbt pipeline
-end to end.
+a Dockerized BI layer, an Airflow DAG orchestrating the dbt pipeline end
+to end, and a dbt layer verified to run on both Postgres and Snowflake.
 
 Every number in this README is real, captured from an actual run against a
 live Postgres 16 instance -- see `results/verification_output.txt` and
@@ -113,6 +113,31 @@ Deployed with Docker and run end to end against a live scheduler -- all
 three tasks succeeded, 20/20 models built, 50/50 tests passed. Full task
 logs captured in `results/airflow_dag_run_output.txt`; setup steps and
 what's verified vs. not are in `airflow/README.md`.
+
+## Snowflake portability (from `results/dbt_snowflake_verification_output.txt`)
+
+The dbt layer (`dbt/commercelens/`) runs on Snowflake as well as Postgres,
+verified against a real Snowflake trial account -- the same 20 models and
+50 tests, **20/20 and 50/50 passing**, with row counts matching the
+Postgres run exactly (`dim_customer`=5,000, `fct_orders`=25,000,
+`fct_order_items`=74,859, `fct_returns`=12,963, `mart_customer_rfm`=4,963).
+Getting there meant fixing three genuinely Postgres-only constructs:
+`generate_series` (no Snowflake equivalent -- replaced with a
+`GENERATOR()`-based date spine in `dim_date.sql`), the `~` regex operator
+(Snowflake uses `RLIKE` -- abstracted behind a `regex_match()` macro in
+`dbt/commercelens/macros/cross_db_regex_match.sql` that dispatches on
+`target.type`), and `DISTINCT ON` (not supported in Snowflake -- replaced
+with `QUALIFY` + `ROW_NUMBER()` there). All three are target-conditional,
+so the Postgres path is unchanged from what was already verified.
+
+One real scope boundary this did *not* close: the raw CSVs were loaded
+into Snowflake by hand for this test (via Snowflake's own upload wizard),
+not through the Airflow DAG's `ingest_raw_data` task, which is still
+Postgres-only (`COPY FROM STDIN` via psycopg2 has no direct Snowflake
+equivalent -- that's `PUT` + `COPY INTO`, a real rework, not a config
+swap). So: **the dbt transformation layer is verified on Snowflake; a
+full Airflow-orchestrated Snowflake run still isn't** -- don't conflate
+the two. See `dbt_profile/profiles.yml` for the exact status note.
 
 ## A real bug this project caught
 

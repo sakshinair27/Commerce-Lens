@@ -10,16 +10,28 @@
 # stays as the plain, human-oriented template for local/manual dbt use
 # documented in the README. This file is the automation-facing one.
 #
-# Status: the `dev` (Postgres) target below is the one actually exercised
-# by the DAG today. The `snowflake` target is written out so the shape of
-# the eventual migration is explicit, but it has NOT been run against a
-# real Snowflake account -- there's no Snowflake instance in this project
-# yet. Migrating later means: stand up Snowflake, create a `warehouse_conn`
-# Airflow Connection of type Snowflake, fill in the DBT_SF_* env vars it
-# maps to (see commercelens_dag.py's _dbt_env_for_connection), and flip the
-# COMMERCELENS_DBT_TARGET Airflow Variable to "snowflake". No DAG code
-# changes, and this file doesn't change either -- the target block is
-# already here.
+# Status: the `dev` (Postgres) target is what the Airflow DAG runs
+# against today. The `snowflake` target has now been run for real --
+# `dbt run && dbt test` against an actual Snowflake trial account,
+# 20/20 models and 50/50 tests passing, output captured in
+# ../results/dbt_snowflake_verification_output.txt. Three Postgres-only
+# SQL constructs needed real fixes to get there: `generate_series` (no
+# Snowflake equivalent -- replaced with a GENERATOR()-based date spine),
+# the `~` regex operator (Snowflake uses RLIKE -- added the
+# `regex_match()` macro in macros/cross_db_regex_match.sql to dispatch on
+# `target.type`), and `DISTINCT ON` (not supported in Snowflake --
+# replaced with QUALIFY + ROW_NUMBER() there). All three are
+# target-conditional in the model SQL, so the Postgres path is byte-for-
+# byte unchanged from what was already verified.
+#
+# One real scope boundary this did NOT close: the run above loaded the
+# raw CSVs into Snowflake by hand (Snowflake's own upload wizard), not
+# through the Airflow DAG's ingest_raw_data task, which is still
+# Postgres-only (see commercelens_dag.py's module docstring). So: the
+# dbt transformation layer is verified on Snowflake; a full Airflow-
+# orchestrated Snowflake run still needs that ingestion task reworked
+# for PUT + COPY INTO. Don't claim the orchestrated DAG itself runs on
+# Snowflake -- only that dbt does, independent of Airflow.
 
 commercelens:
   target: "{{ env_var('DBT_TARGET', 'dev') }}"
@@ -36,8 +48,8 @@ commercelens:
       schema: "{{ env_var('DBT_PG_SCHEMA', 'dbt_dev') }}"
       threads: 4
 
-    # Snowflake -- shape only, untested. Prepared so the migration is a
-    # connection + variable swap, not a rewrite.
+    # Snowflake -- real, verified via a manual dbt run (see status note
+    # above). Not yet wired through the Airflow DAG end to end.
     snowflake:
       type: snowflake
       account: "{{ env_var('DBT_SF_ACCOUNT') }}"

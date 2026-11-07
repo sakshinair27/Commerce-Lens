@@ -1,0 +1,268 @@
+17:56:34  Running with dbt=1.13.0-rc1
+17:56:35  Registered adapter: snowflake=1.12.5
+17:56:37  [WARNING][MissingArgumentsPropertyInGenericTestDeprecation]: Deprecated
+functionality
+Found top-level arguments to test `relationships` defined on 'stg_returns' in
+package 'commercelens' (models\staging\_stg_schema.yml). Arguments to generic
+tests should be nested under the `arguments` property.
+17:56:37  Found 20 models, 50 data tests, 6 sources, 565 macros
+17:56:37  
+17:56:37  Concurrency: 4 threads (target='snowflake')
+17:56:37  
+dbt : C:\Users\PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\snowflake\connector\connection\_connection.
+py:137: FutureWarning: enable_server_session_keep_alive_auto_detection was not set and defaults to True. In a future 
+version, the default will change to None. Please provide an explicit value: True = check for running async queries 
+before logout (queries are preserved); False/None = always send logout on close (async queries may be terminated by 
+server). Logout behavior can also be overridden with server_session_keep_alive. See the connection parameter docs for 
+more info.
+At line:1 char:1
++ dbt run --project-dir dbt\commercelens --profiles-dir dbt_profile 2>& ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (C:\Users\PC\App... for more info.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  options = self.config.to_proto_options(
+C:\Users\PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\snowflake\connector\_internal\decorators.py:459: 
+UserWarning: Unknown parameter 'reuse_connections'
+  result = func(self, *args, **kwargs)
+C:\Users\PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\snowflake\connector\_internal\decorators.py:459: 
+UserWarning: Unknown parameter 'insecure_mode'
+  result = func(self, *args, **kwargs)
+C:\Users\PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\snowflake\connector\_internal\decorators.py:459: 
+UserWarning: Unknown parameter 'ocsp_root_certs_dict_lock_timeout'
+  result = func(self, *args, **kwargs)
+C:\Users\PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\snowflake\connector\connection\_connection.py:137
+: FutureWarning: enable_server_session_keep_alive_auto_detection was not set and defaults to True. In a future 
+version, the default will change to None. Please provide an explicit value: True = check for running async queries 
+before logout (queries are preserved); False/None = always send logout on close (async queries may be terminated by 
+server). Logout behavior can also be overridden with server_session_keep_alive. See the connection parameter docs for 
+more info.
+  options = self.config.to_proto_options(
+C:\Users\PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\snowflake\connector\_internal\decorators.py:459: 
+UserWarning: Unknown parameter 'ocsp_root_certs_dict_lock_timeout'
+  result = func(self, *args, **kwargs)
+C:\Users\PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\snowflake\connector\_internal\decorators.py:459: 
+UserWarning: Unknown parameter 'insecure_mode'
+  result = func(self, *args, **kwargs)
+C:\Users\PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\snowflake\connector\_internal\decorators.py:459: 
+UserWarning: Unknown parameter 'reuse_connections'
+  result = func(self, *args, **kwargs)
+17:56:41  1 of 20 START sql table model dbt_dev_marts.dim_date ........................... [RUN]
+17:56:41  2 of 20 START sql view model dbt_dev_staging.stg_categories .................... [RUN]
+17:56:41  3 of 20 START sql view model dbt_dev_staging.stg_customers ..................... [RUN]
+17:56:41  4 of 20 START sql view model dbt_dev_staging.stg_order_items ................... [RUN]
+C:\Users\PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\snowflake\connector\connection\_connection.py:137
+: FutureWarning: enable_server_session_keep_alive_auto_detection was not set and defaults to True. In a future 
+version, the default will change to None. Please provide an explicit value: True = check for running async queries 
+before logout (queries are preserved); False/None = always send logout on close (async queries may be terminated by 
+server). Logout behavior can also be overridden with server_session_keep_alive. See the connection parameter docs for 
+more info.
+  options = self.config.to_proto_options(
+C:\Users\PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\snowflake\connector\_internal\decorators.py:459: 
+UserWarning: Unknown parameter 'reuse_connections'
+  result = func(self, *args, **kwargs)
+C:\Users\PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\snowflake\connector\_internal\decorators.py:459: 
+UserWarning: Unknown parameter 'insecure_mode'
+  result = func(self, *args, **kwargs)
+C:\Users\PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\snowflake\connector\_internal\decorators.py:459: 
+UserWarning: Unknown parameter 'ocsp_root_certs_dict_lock_timeout'
+  result = func(self, *args, **kwargs)
+17:56:42  2 of 20 OK created sql view model dbt_dev_staging.stg_categories ............... [SUCCESS 1 in 1.39s]
+17:56:42  5 of 20 START sql view model dbt_dev_staging.stg_orders ........................ [RUN]
+17:56:42  3 of 20 OK created sql view model dbt_dev_staging.stg_customers ................ [SUCCESS 1 in 1.41s]
+17:56:42  6 of 20 START sql view model dbt_dev_staging.stg_products ...................... [RUN]
+17:56:43  5 of 20 OK created sql view model dbt_dev_staging.stg_orders ................... [SUCCESS 1 in 0.51s]
+17:56:43  4 of 20 OK created sql view model dbt_dev_staging.stg_order_items .............. [SUCCESS 1 in 1.91s]
+17:56:43  7 of 20 START sql view model dbt_dev_staging.stg_returns ....................... [RUN]
+17:56:43  8 of 20 START sql table model dbt_dev_marts.dim_category ....................... [RUN]
+17:56:43  6 of 20 OK created sql view model dbt_dev_staging.stg_products ................. [SUCCESS 1 in 0.52s]
+17:56:43  9 of 20 START sql table model dbt_dev_marts.dim_customer ....................... [RUN]
+17:56:43  7 of 20 OK created sql view model dbt_dev_staging.stg_returns .................. [SUCCESS 1 in 0.51s]
+17:56:43  10 of 20 START sql view model dbt_dev_intermediate.int_order_items_enriched .... [RUN]
+17:56:44  1 of 20 OK created sql table model dbt_dev_marts.dim_date ...................... [SUCCESS 1096 in 2.58s]
+17:56:44  8 of 20 OK created sql table model dbt_dev_marts.dim_category .................. [SUCCESS 24 in 1.34s]
+17:56:44  11 of 20 START sql table model dbt_dev_marts.dim_product ....................... [RUN]
+17:56:45  9 of 20 OK created sql table model dbt_dev_marts.dim_customer .................. [SUCCESS 5000 in 1.61s]
+17:56:45  10 of 20 OK created sql view model dbt_dev_intermediate.int_order_items_enriched  [SUCCESS 1 in 1.24s]
+17:56:45  12 of 20 START sql view model dbt_dev_intermediate.int_order_totals ............ [RUN]
+17:56:46  12 of 20 OK created sql view model dbt_dev_intermediate.int_order_totals ....... [SUCCESS 1 in 1.24s]
+17:56:46  13 of 20 START sql table model dbt_dev_marts.fct_orders ........................ [RUN]
+17:56:46  14 of 20 START sql view model dbt_dev_intermediate.int_customer_order_facts .... [RUN]
+17:56:46  11 of 20 OK created sql table model dbt_dev_marts.dim_product .................. [SUCCESS 500 in 1.84s]
+17:56:47  14 of 20 OK created sql view model dbt_dev_intermediate.int_customer_order_facts  [SUCCESS 1 in 0.93s]
+17:56:47  15 of 20 START sql table model dbt_dev_marts.mart_customer_rfm ................. [RUN]
+17:56:49  13 of 20 OK created sql table model dbt_dev_marts.fct_orders ................... [SUCCESS 25000 in 2.84s]
+17:56:49  16 of 20 START sql table model dbt_dev_marts.fct_order_items ................... [RUN]
+17:56:49  17 of 20 START sql table model dbt_dev_marts.mart_cohort_retention ............. [RUN]
+17:56:49  18 of 20 START sql table model dbt_dev_marts.mart_monthly_revenue_growth ....... [RUN]
+17:56:49  15 of 20 OK created sql table model dbt_dev_marts.mart_customer_rfm ............ [SUCCESS 4963 in 1.95s]
+17:56:50  18 of 20 OK created sql table model dbt_dev_marts.mart_monthly_revenue_growth .. [SUCCESS 1 in 1.12s]
+17:56:50  17 of 20 OK created sql table model dbt_dev_marts.mart_cohort_retention ........ [SUCCESS 1 in 1.22s]
+17:56:51  16 of 20 OK created sql table model dbt_dev_marts.fct_order_items .............. [SUCCESS 74859 in 1.82s]
+17:56:51  19 of 20 START sql table model dbt_dev_marts.fct_returns ....................... [RUN]
+17:56:51  20 of 20 START sql table model dbt_dev_marts.mart_category_sales_rollup ........ [RUN]
+17:56:53  19 of 20 OK created sql table model dbt_dev_marts.fct_returns .................. [SUCCESS 12963 in 1.82s]
+17:56:53  20 of 20 OK created sql table model dbt_dev_marts.mart_category_sales_rollup ... [SUCCESS 6 in 1.89s]
+17:56:56  
+17:56:56  Finished running 11 table models, 9 view models in 0 hours 0 minutes and 19.13 seconds (19.13s).
+17:56:56  
+17:56:56  Completed successfully
+17:56:56  
+17:56:56  Done. PASS=20 WARN=0 ERROR=0 SKIP=0 NO-OP=0 REUSED=0 TOTAL=20
+17:56:56  [WARNING][DeprecationsSummary]: Deprecated functionality
+Summary of encountered deprecations:
+- MissingArgumentsPropertyInGenericTestDeprecation: 5 occurrences
+To see all deprecation instances instead of just the first occurrence of each,
+run command again with the `--show-all-deprecations` flag. You may also need to
+run with `--no-partial-parse` as some deprecations are only encountered during
+parsing.
+17:57:44  Running with dbt=1.13.0-rc1
+17:57:45  Registered adapter: snowflake=1.12.5
+17:57:46  Found 20 models, 50 data tests, 6 sources, 565 macros
+17:57:46  
+17:57:46  Concurrency: 4 threads (target='snowflake')
+17:57:46  
+dbt : C:\Users\PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\snowflake\connector\connection\_connection.
+py:137: FutureWarning: enable_server_session_keep_alive_auto_detection was not set and defaults to True. In a future 
+version, the default will change to None. Please provide an explicit value: True = check for running async queries 
+before logout (queries are preserved); False/None = always send logout on close (async queries may be terminated by 
+server). Logout behavior can also be overridden with server_session_keep_alive. See the connection parameter docs for 
+more info.
+At line:1 char:1
++ dbt test --project-dir dbt\commercelens --profiles-dir dbt_profile 2> ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (C:\Users\PC\App... for more info.:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  options = self.config.to_proto_options(
+C:\Users\PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\snowflake\connector\_internal\decorators.py:459: 
+UserWarning: Unknown parameter 'ocsp_root_certs_dict_lock_timeout'
+  result = func(self, *args, **kwargs)
+C:\Users\PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\snowflake\connector\_internal\decorators.py:459: 
+UserWarning: Unknown parameter 'reuse_connections'
+  result = func(self, *args, **kwargs)
+C:\Users\PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\snowflake\connector\_internal\decorators.py:459: 
+UserWarning: Unknown parameter 'insecure_mode'
+  result = func(self, *args, **kwargs)
+17:57:48  1 of 50 START test accepted_values_fct_orders_order_status__placed__shipped__delivered__cancelled__returned  [RUN]
+17:57:48  2 of 50 START test accepted_values_mart_customer_rfm_segment__champion__loyal__at_risk__lost  [RUN]
+17:57:48  3 of 50 START test accepted_values_stg_orders_order_status__placed__shipped__delivered__cancelled__returned  [RUN]
+17:57:48  4 of 50 START test non_negative_number_stg_products_unit_price ................. [RUN]
+C:\Users\PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\snowflake\connector\connection\_connection.py:137
+: FutureWarning: enable_server_session_keep_alive_auto_detection was not set and defaults to True. In a future 
+version, the default will change to None. Please provide an explicit value: True = check for running async queries 
+before logout (queries are preserved); False/None = always send logout on close (async queries may be terminated by 
+server). Logout behavior can also be overridden with server_session_keep_alive. See the connection parameter docs for 
+more info.
+  options = self.config.to_proto_options(
+C:\Users\PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\snowflake\connector\_internal\decorators.py:459: 
+UserWarning: Unknown parameter 'insecure_mode'
+  result = func(self, *args, **kwargs)
+C:\Users\PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\snowflake\connector\_internal\decorators.py:459: 
+UserWarning: Unknown parameter 'reuse_connections'
+  result = func(self, *args, **kwargs)
+C:\Users\PC\AppData\Local\Programs\Python\Python311\Lib\site-packages\snowflake\connector\_internal\decorators.py:459: 
+UserWarning: Unknown parameter 'ocsp_root_certs_dict_lock_timeout'
+  result = func(self, *args, **kwargs)
+17:57:49  3 of 50 PASS accepted_values_stg_orders_order_status__placed__shipped__delivered__cancelled__returned  [PASS in 0.96s]
+17:57:49  5 of 50 START test not_null_dim_category_category_key .......................... [RUN]
+17:57:49  1 of 50 PASS accepted_values_fct_orders_order_status__placed__shipped__delivered__cancelled__returned  [PASS in 0.98s]
+17:57:49  6 of 50 START test not_null_dim_customer_customer_id ........................... [RUN]
+17:57:50  4 of 50 PASS non_negative_number_stg_products_unit_price ....................... [PASS in 1.16s]
+17:57:50  7 of 50 START test not_null_dim_customer_customer_key .......................... [RUN]
+17:57:50  6 of 50 PASS not_null_dim_customer_customer_id ................................. [PASS in 0.20s]
+17:57:50  8 of 50 START test not_null_dim_date_date_key .................................. [RUN]
+17:57:50  5 of 50 PASS not_null_dim_category_category_key ................................ [PASS in 0.29s]
+17:57:50  2 of 50 PASS accepted_values_mart_customer_rfm_segment__champion__loyal__at_risk__lost  [PASS in 1.25s]
+17:57:50  9 of 50 START test not_null_dim_product_product_id ............................. [RUN]
+17:57:50  10 of 50 START test not_null_dim_product_product_key ........................... [RUN]
+17:57:50  7 of 50 PASS not_null_dim_customer_customer_key ................................ [PASS in 0.24s]
+17:57:50  11 of 50 START test not_null_fct_order_items_order_item_key .................... [RUN]
+17:57:50  8 of 50 PASS not_null_dim_date_date_key ........................................ [PASS in 0.26s]
+17:57:50  12 of 50 START test not_null_fct_orders_order_key .............................. [RUN]
+17:57:50  9 of 50 PASS not_null_dim_product_product_id ................................... [PASS in 0.23s]
+17:57:50  13 of 50 START test not_null_fct_returns_return_key ............................ [RUN]
+17:57:50  10 of 50 PASS not_null_dim_product_product_key ................................. [PASS in 0.27s]
+17:57:50  14 of 50 START test not_null_mart_category_sales_rollup_category_key ........... [RUN]
+17:57:50  11 of 50 PASS not_null_fct_order_items_order_item_key .......................... [PASS in 0.54s]
+17:57:50  15 of 50 START test not_null_mart_customer_rfm_customer_key .................... [RUN]
+17:57:50  12 of 50 PASS not_null_fct_orders_order_key .................................... [PASS in 0.51s]
+17:57:50  16 of 50 START test not_null_mart_monthly_revenue_growth_order_month ........... [RUN]
+17:57:50  13 of 50 PASS not_null_fct_returns_return_key .................................. [PASS in 0.56s]
+17:57:50  17 of 50 START test not_null_stg_categories_category_id ........................ [RUN]
+17:57:51  16 of 50 PASS not_null_mart_monthly_revenue_growth_order_month ................. [PASS in 0.29s]
+17:57:51  15 of 50 PASS not_null_mart_customer_rfm_customer_key .......................... [PASS in 0.33s]
+17:57:51  18 of 50 START test not_null_stg_customers_customer_id ......................... [RUN]
+17:57:51  19 of 50 START test not_null_stg_order_items_order_item_id ..................... [RUN]
+17:57:51  17 of 50 PASS not_null_stg_categories_category_id .............................. [PASS in 0.39s]
+17:57:51  20 of 50 START test not_null_stg_orders_order_id ............................... [RUN]
+17:57:51  14 of 50 PASS not_null_mart_category_sales_rollup_category_key ................. [PASS in 0.95s]
+17:57:51  21 of 50 START test not_null_stg_products_product_id ........................... [RUN]
+17:57:51  19 of 50 PASS not_null_stg_order_items_order_item_id ........................... [PASS in 0.22s]
+17:57:51  22 of 50 START test not_null_stg_returns_return_id ............................. [RUN]
+17:57:51  18 of 50 PASS not_null_stg_customers_customer_id ............................... [PASS in 0.28s]
+17:57:51  23 of 50 START test relationships_fct_order_items_order_key__order_key__ref_fct_orders_  [RUN]
+17:57:51  21 of 50 PASS not_null_stg_products_product_id ................................. [PASS in 0.19s]
+17:57:51  24 of 50 START test relationships_fct_order_items_product_key__product_key__ref_dim_product_  [RUN]
+17:57:51  20 of 50 PASS not_null_stg_orders_order_id ..................................... [PASS in 0.28s]
+17:57:51  25 of 50 START test relationships_fct_orders_customer_key__customer_key__ref_dim_customer_  [RUN]
+17:57:51  22 of 50 PASS not_null_stg_returns_return_id ................................... [PASS in 0.46s]
+17:57:51  26 of 50 START test relationships_fct_returns_order_item_key__order_item_key__ref_fct_order_items_  [RUN]
+17:57:52  23 of 50 PASS relationships_fct_order_items_order_key__order_key__ref_fct_orders_  [PASS in 0.67s]
+17:57:52  27 of 50 START test relationships_stg_order_items_order_id__order_id__ref_stg_orders_  [RUN]
+17:57:52  25 of 50 PASS relationships_fct_orders_customer_key__customer_key__ref_dim_customer_  [PASS in 0.56s]
+17:57:52  28 of 50 START test relationships_stg_order_items_product_id__product_id__ref_stg_products_  [RUN]
+17:57:52  26 of 50 PASS relationships_fct_returns_order_item_key__order_item_key__ref_fct_order_items_  [PASS in 0.44s]
+17:57:52  29 of 50 START test relationships_stg_orders_customer_id__customer_id__ref_stg_customers_  [RUN]
+17:57:52  24 of 50 PASS relationships_fct_order_items_product_key__product_key__ref_dim_product_  [PASS in 0.90s]
+17:57:52  30 of 50 START test relationships_stg_products_category_id__category_id__ref_stg_categories_  [RUN]
+17:57:52  28 of 50 PASS relationships_stg_order_items_product_id__product_id__ref_stg_products_  [PASS in 0.42s]
+17:57:52  31 of 50 START test relationships_stg_returns_order_item_id__order_item_id__ref_stg_order_items_  [RUN]
+17:57:52  27 of 50 PASS relationships_stg_order_items_order_id__order_id__ref_stg_orders_  [PASS in 0.58s]
+17:57:52  32 of 50 START test unique_dim_category_category_key ........................... [RUN]
+17:57:53  32 of 50 PASS unique_dim_category_category_key ................................. [PASS in 0.31s]
+17:57:53  33 of 50 START test unique_dim_customer_customer_id ............................ [RUN]
+17:57:53  31 of 50 PASS relationships_stg_returns_order_item_id__order_item_id__ref_stg_order_items_  [PASS in 0.53s]
+17:57:53  34 of 50 START test unique_dim_customer_customer_key ........................... [RUN]
+17:57:53  30 of 50 PASS relationships_stg_products_category_id__category_id__ref_stg_categories_  [PASS in 0.70s]
+17:57:53  35 of 50 START test unique_dim_date_date_key ................................... [RUN]
+17:57:53  33 of 50 PASS unique_dim_customer_customer_id .................................. [PASS in 0.31s]
+17:57:53  36 of 50 START test unique_dim_product_product_id .............................. [RUN]
+17:57:53  34 of 50 PASS unique_dim_customer_customer_key ................................. [PASS in 0.26s]
+17:57:53  37 of 50 START test unique_dim_product_product_key ............................. [RUN]
+17:57:53  35 of 50 PASS unique_dim_date_date_key ......................................... [PASS in 0.30s]
+17:57:53  38 of 50 START test unique_fct_order_items_order_item_key ...................... [RUN]
+17:57:53  29 of 50 PASS relationships_stg_orders_customer_id__customer_id__ref_stg_customers_  [PASS in 1.21s]
+17:57:53  39 of 50 START test unique_fct_orders_order_key ................................ [RUN]
+17:57:53  37 of 50 PASS unique_dim_product_product_key ................................... [PASS in 0.16s]
+17:57:53  40 of 50 START test unique_fct_returns_return_key .............................. [RUN]
+17:57:53  36 of 50 PASS unique_dim_product_product_id .................................... [PASS in 0.32s]
+17:57:53  41 of 50 START test unique_mart_category_sales_rollup_category_key ............. [RUN]
+17:57:53  39 of 50 PASS unique_fct_orders_order_key ...................................... [PASS in 0.20s]
+17:57:53  42 of 50 START test unique_mart_customer_rfm_customer_key ...................... [RUN]
+17:57:53  40 of 50 PASS unique_fct_returns_return_key .................................... [PASS in 0.20s]
+17:57:53  43 of 50 START test unique_mart_monthly_revenue_growth_order_month ............. [RUN]
+17:57:53  41 of 50 PASS unique_mart_category_sales_rollup_category_key ................... [PASS in 0.22s]
+17:57:53  44 of 50 START test unique_stg_categories_category_id .......................... [RUN]
+17:57:54  42 of 50 PASS unique_mart_customer_rfm_customer_key ............................ [PASS in 0.28s]
+17:57:54  45 of 50 START test unique_stg_customers_customer_id ........................... [RUN]
+17:57:54  43 of 50 PASS unique_mart_monthly_revenue_growth_order_month ................... [PASS in 0.28s]
+17:57:54  46 of 50 START test unique_stg_customers_email ................................. [RUN]
+17:57:54  38 of 50 PASS unique_fct_order_items_order_item_key ............................ [PASS in 0.64s]
+17:57:54  47 of 50 START test unique_stg_order_items_order_item_id ....................... [RUN]
+17:57:54  44 of 50 PASS unique_stg_categories_category_id ................................ [PASS in 0.23s]
+17:57:54  48 of 50 START test unique_stg_orders_order_id ................................. [RUN]
+17:57:54  45 of 50 PASS unique_stg_customers_customer_id ................................. [PASS in 0.23s]
+17:57:54  49 of 50 START test unique_stg_products_product_id ............................. [RUN]
+17:57:54  47 of 50 PASS unique_stg_order_items_order_item_id ............................. [PASS in 0.24s]
+17:57:54  50 of 50 START test unique_stg_returns_return_id ............................... [RUN]
+17:57:54  48 of 50 PASS unique_stg_orders_order_id ....................................... [PASS in 0.25s]
+17:57:54  46 of 50 PASS unique_stg_customers_email ....................................... [PASS in 0.39s]
+17:57:54  49 of 50 PASS unique_stg_products_product_id ................................... [PASS in 0.49s]
+17:57:55  50 of 50 PASS unique_stg_returns_return_id ..................................... [PASS in 0.71s]
+17:57:56  
+17:57:56  Finished running 50 data tests in 0 hours 0 minutes and 9.78 seconds (9.78s).
+17:57:56  
+17:57:56  Completed successfully
+17:57:56  
+17:57:56  Done. PASS=50 WARN=0 ERROR=0 SKIP=0 NO-OP=0 REUSED=0 TOTAL=50
