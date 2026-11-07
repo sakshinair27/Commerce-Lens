@@ -4,8 +4,9 @@ An end-to-end, advanced-SQL-driven data warehouse project built on a
 realistically messy synthetic e-commerce dataset. Real PostgreSQL (not
 SQLite), a hand-written SQL ETL and an equivalent dbt project side by
 side, PL/pgSQL triggers/procedures, a real query-optimization case study,
-a Dockerized BI layer, an Airflow DAG orchestrating the dbt pipeline end
-to end, and a dbt layer verified to run on both Postgres and Snowflake.
+a Dockerized BI layer, and an Airflow DAG orchestrating the full pipeline
+(ingestion -> `dbt run` -> `dbt test`) end to end against a live scheduler
+on both Postgres and Snowflake.
 
 Every number in this README is real, captured from an actual run against a
 live Postgres 16 instance -- see `results/verification_output.txt` and
@@ -22,7 +23,7 @@ live Postgres 16 instance -- see `results/verification_output.txt` and
 | `sql/advanced/` | Window functions (RFM, MoM growth, cohort retention), a recursive CTE |
 | `sql/optimization/case_study.sql` | Real `EXPLAIN ANALYZE` before/after indexing |
 | `dbt/commercelens/` | The same transformation rebuilt as staging/intermediate/marts, with 50 tests |
-| `airflow/` | Apache Airflow DAG orchestrating ingestion -> `dbt run` -> `dbt test`, warehouse config-driven (Postgres today, Snowflake-ready) -- see `airflow/README.md` for the real, verified run |
+| `airflow/` | Apache Airflow DAG orchestrating ingestion -> `dbt run` -> `dbt test`, warehouse config-driven and verified end to end on both Postgres and Snowflake -- see `airflow/README.md` for the real, verified runs |
 | `docker-compose.yml` + `docker/init/` | One-command Postgres + Metabase, auto-seeded |
 | `bi/metabase_setup.md` | Dashboard setup on the Dockerized BI layer |
 
@@ -130,14 +131,19 @@ Getting there meant fixing three genuinely Postgres-only constructs:
 with `QUALIFY` + `ROW_NUMBER()` there). All three are target-conditional,
 so the Postgres path is unchanged from what was already verified.
 
-One real scope boundary this did *not* close: the raw CSVs were loaded
-into Snowflake by hand for this test (via Snowflake's own upload wizard),
-not through the Airflow DAG's `ingest_raw_data` task, which is still
-Postgres-only (`COPY FROM STDIN` via psycopg2 has no direct Snowflake
-equivalent -- that's `PUT` + `COPY INTO`, a real rework, not a config
-swap). So: **the dbt transformation layer is verified on Snowflake; a
-full Airflow-orchestrated Snowflake run still isn't** -- don't conflate
-the two. See `dbt_profile/profiles.yml` for the exact status note.
+That first Snowflake pass loaded the raw CSVs by hand (via Snowflake's own
+upload wizard), not through the Airflow DAG -- the DAG's `ingest_raw_data`
+task was still Postgres-only (`COPY FROM STDIN` via psycopg2 has no direct
+Snowflake equivalent). That gap is closed now: `ingest_raw_data` dispatches
+on the Airflow connection's type, using `scripts/load_raw_snowflake.py`
+(`PUT` + `COPY INTO`, a genuinely different mechanism, not a config swap)
+for Snowflake and the original `psycopg2` path for Postgres. The full DAG
+-- `ingest_raw_data` -> `dbt_run` -> `dbt_test` -- has since been triggered
+end to end against the live Snowflake trial account through the same
+Dockerized Airflow scheduler used for the Postgres run, with all three
+tasks succeeding: 113,371 rows ingested with exact row-count parity,
+20/20 models, 50/50 tests. Full task logs in
+`results/snowflake_dag_run_output.txt`.
 
 ## A real bug this project caught
 

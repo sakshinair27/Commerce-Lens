@@ -58,20 +58,29 @@ project documents its verification (see `results/` in the repo root):
   `WEB_SERVER_MASTER_TIMEOUT` / `WEB_SERVER_WORKER_TIMEOUT` /  `WORKERS`
   settings in `docker-compose.yaml`), and the `__dbt_backup` concurrency
   race described above (fixed via `max_active_runs=1`).
-- **Verified separately (Snowflake, dbt only, not through this DAG):**
-  the `snowflake` target in `dbt_profile/profiles.yml` has now been run
-  for real -- `dbt run && dbt test` directly against a Snowflake trial
-  account, 20/20 models and 50/50 tests passing, row counts matching the
-  Postgres run exactly. See the root README's "Snowflake portability"
-  section and `../results/dbt_snowflake_verification_output.txt`. Three
-  Postgres-only SQL constructs (`generate_series`, the `~` regex
-  operator, `DISTINCT ON`) needed target-conditional fixes to get there.
-- **Still not exercised:** this DAG itself has never been run against
-  Snowflake -- the verification above loaded the raw CSVs by hand via
-  Snowflake's upload UI, bypassing `ingest_raw_data` entirely, because
-  that task is still Postgres-only (see "Migrating to Snowflake later"
-  below). Don't claim the orchestrated DAG runs on Snowflake; only that
-  the dbt layer it calls does.
+- **Verified end to end, for real (Snowflake):** the dbt layer was first
+  verified standalone against a real Snowflake trial account (`dbt run &&
+  dbt test` directly, 20/20 models and 50/50 tests passing, row counts
+  matching the Postgres run exactly -- three Postgres-only SQL constructs,
+  `generate_series`, the `~` regex operator, and `DISTINCT ON`, needed
+  target-conditional fixes to get there; see the root README's "Snowflake
+  portability" section and `../results/dbt_snowflake_verification_output.txt`).
+  `ingest_raw_data` was then reworked to dispatch on the Airflow
+  connection's `conn_type` -- Postgres keeps using `psycopg2`'s
+  `COPY FROM STDIN` (`scripts/load_raw.py`); Snowflake uses `PUT` +
+  `COPY INTO` (`scripts/load_raw_snowflake.py`), a genuinely different
+  mechanism, not a connection-string swap. With `warehouse_conn`
+  re-pointed at the same Snowflake trial account and
+  `COMMERCELENS_DBT_TARGET` set to `snowflake`, this DAG was triggered for
+  real against the Dockerized Airflow scheduler (same setup as the
+  Postgres run) on `2026-11-07`, run id
+  `manual__2026-11-07T21:21:16+00:00`. All three tasks succeeded in
+  order: `ingest_raw_data` loaded 113,371 rows across 6 tables with exact
+  row-count parity (categories=24, customers=5025, products=500,
+  orders=25000, order_items=74859, returns=12963), `dbt_run` built all 20
+  models (`PASS=20 WARN=0 ERROR=0 SKIP=0`), and `dbt_test` passed all 50
+  tests (`PASS=50 WARN=0 ERROR=0 SKIP=0`). Full task logs in
+  `../results/snowflake_dag_run_output.txt`.
 
 ## Setup
 
@@ -125,44 +134,56 @@ Airflow's own pinned packages.
    `airflow webserver` + `airflow scheduler` in separate terminals, then
    `airflow dags trigger commercelens_elt`.
 
-## Migrating to Snowflake later
+## Migrating to Snowflake (done -- here's exactly how)
 
 This is the part the DAG was specifically designed around, per the design
-brief: the warehouse is config, not code.
+brief: the warehouse is config, not code. It's now actually been done end
+to end against a real Snowflake trial account, not just planned -- these
+are the real steps, including the one genuine DAG code change needed
+(`ingest_raw_data`'s ingestion mechanism, not just its config).
 
-**Update:** the `dbt_run` / `dbt_test` steps below are no longer
-hypothetical -- the dbt layer has been verified against a real Snowflake
-trial account (20/20 models, 50/50 tests passing; see the root README's
-"Snowflake portability" section and `results/dbt_snowflake_verification_output.txt`).
-Three Postgres-only SQL constructs needed fixing to get there
-(`generate_series`, the `~` regex operator, `DISTINCT ON`) -- all handled
-target-conditionally so the Postgres path is untouched. What's still
-**not** done is step 4 below (reworking `ingest_raw_data`) and running
-the actual Airflow DAG against Snowflake end to end -- the verification
-so far loaded the raw CSVs by hand, bypassing the DAG's ingestion task
-entirely.
-
-1. Stand up Snowflake, create a user/role/warehouse/database for this project.
+1. Add `dbt-snowflake` to `/opt/dbt_venv` and `snowflake-connector-python`
+   to Airflow's own environment in `airflow/Dockerfile`, then
+   `docker compose build && docker compose up -d` to pick it up. (The
+   two installs are deliberately separate: `dbt_run`/`dbt_test` call
+   `dbt` as a subprocess inside `/opt/dbt_venv`; `ingest_raw_data` runs
+   as a `PythonOperator` inside Airflow's own interpreter, so it needs
+   `snowflake.connector` importable there -- a `--user` install fails in
+   that venv, a plain `pip install` works.)
 2. Re-point (or add a second) `warehouse_conn` Connection with
-   Conn Type `Snowflake`, filling in account/warehouse/role/database in
-   its `extra` field (see `_dbt_env_for_connection` in the DAG file for
-   exactly which keys it reads).
-3. Set the Airflow Variable `COMMERCELENS_DBT_TARGET` to `snowflake`.
-4. Rework `ingest_raw_data` in `commercelens_dag.py` -- this is still the
-   one genuine exception to "no DAG code changes," and the one piece this
-   verification pass didn't cover. Postgres ingestion here uses
-   `COPY FROM STDIN` via psycopg2; Snowflake's equivalent is `PUT` +
-   `COPY INTO`, a different mechanism, not a connection-string swap.
-   Budget real time for this step specifically.
+   Conn Type `Snowflake` (delete the old one first if reusing the same
+   `conn_id`: `airflow connections delete warehouse_conn`), filling in
+   account/warehouse/role/database in its `extra` field (see
+   `_dbt_env_for_connection` in the DAG file for exactly which keys it
+   reads), e.g.:
+   ```
+   airflow connections add warehouse_conn --conn-type snowflake \
+     --conn-login <user> --conn-password <password> \
+     --conn-extra '{"account": "<account_id>", "warehouse": "<warehouse>", "role": "<role>", "database": "<database>"}'
+   ```
+3. Set the Airflow Variable `COMMERCELENS_DBT_TARGET` to `snowflake`:
+   `airflow variables set COMMERCELENS_DBT_TARGET snowflake`
+4. `ingest_raw_data` in `commercelens_dag.py` now dispatches on
+   `warehouse_conn`'s `conn_type` -- Postgres ingestion still uses
+   `COPY FROM STDIN` via psycopg2 (`scripts/load_raw.py`); Snowflake uses
+   `PUT` + `COPY INTO` (`scripts/load_raw_snowflake.py`), a different
+   mechanism, not a connection-string swap. No further code changes
+   needed here -- this step is done.
 5. `dbt_run` / `dbt_test` need no changes -- they already read
    `DBT_TARGET` and the `DBT_SF_*` / `DBT_PG_*` env vars dynamically via
-   `dbt_profile/profiles.yml`, and that target block is now real and
-   verified, not just written out.
+   `dbt_profile/profiles.yml`.
+6. Trigger it: `airflow dags trigger commercelens_elt`, then check
+   `airflow dags list-runs -d commercelens_elt` /
+   `airflow tasks states-for-dag-run commercelens_elt <run_id>`.
 
 ## Files
 
-- `dags/commercelens_dag.py` -- the DAG.
-- `Dockerfile` / `docker-compose.yaml` -- Docker-based Airflow (Option A above).
+- `dags/commercelens_dag.py` -- the DAG. `ingest_raw_data` dispatches on
+  `warehouse_conn`'s `conn_type`; `../scripts/load_raw.py` (Postgres) and
+  `../scripts/load_raw_snowflake.py` (Snowflake) are the two loaders it calls.
+- `Dockerfile` / `docker-compose.yaml` -- Docker-based Airflow (Option A above),
+  with `dbt-snowflake` and `snowflake-connector-python` installed for
+  Snowflake support alongside the original Postgres path.
 - `../dbt_profile/profiles.yml` -- the machine-facing dbt profile the DAG
   points `--profiles-dir` at. Separate from the repo root's
   `dbt/commercelens/profiles_example.yml`, which stays as the

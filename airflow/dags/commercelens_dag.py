@@ -14,27 +14,33 @@ When CommerceLens migrates to Snowflake, the plan is:
 
     1. Create/point `warehouse_conn` at Snowflake (conn_type="snowflake").
     2. Set the Airflow Variable COMMERCELENS_DBT_TARGET to "snowflake"
-       (dbt_profile/profiles.yml in this repo already has a `snowflake`
-       target block ready -- see that file for its current, untested
-       status).
-    3. Done. This DAG file does not change.
+       (dbt_profile/profiles.yml in this repo has a `snowflake` target
+       block, verified against a real account -- see that file's status
+       note).
+    3. Done. This DAG file does not change further.
 
-One honest, deliberate scope boundary: the *ingestion* task
-(`scripts/load_raw.py`) uses Postgres's COPY protocol via psycopg2, which
-has no Snowflake equivalent (Snowflake ingestion is PUT + COPY INTO, a
-genuinely different mechanism, not a connection-string swap). So today,
-`_dbt_env_for_connection` abstracts the warehouse for the dbt tasks across
-both backends, but `ingest_raw_data` is Postgres-specific until it's
-deliberately reworked as part of the Snowflake migration. See this
-directory's README for more.
+Ingestion for both backends is implemented: `ingest_raw_data` dispatches
+on warehouse_conn's conn_type, calling scripts/load_raw.py (psycopg2
+COPY FROM STDIN) for Postgres or scripts/load_raw_snowflake.py (PUT +
+COPY INTO -- Snowflake has no COPY FROM STDIN equivalent, so this is a
+genuinely different mechanism, not a connection-string swap) for
+Snowflake.
 
 Run status: this DAG has been run end to end against a live Airflow
-scheduler (Docker, LocalExecutor) with a real Postgres warehouse_conn --
-all three tasks succeeded on run id
-manual__2026-10-05T21:30:42.218667+00:00. See ../README.md's "Status"
-section and ../../results/airflow_dag_run_output.txt for the real task
-logs. The Snowflake path is still unexercised -- see this module's own
-docstring above for that scope boundary.
+scheduler (Docker, LocalExecutor) with BOTH backends for real.
+
+  - Postgres: all three tasks succeeded on run id
+    manual__2026-10-05T21:30:42.218667+00:00. See ../README.md's
+    "Status" section and ../../results/airflow_dag_run_output.txt.
+  - Snowflake: warehouse_conn was re-pointed at a real Snowflake trial
+    account (conn_type="snowflake") and COMMERCELENS_DBT_TARGET set to
+    "snowflake"; all three tasks succeeded on run id
+    manual__2026-11-07T21:21:16+00:00 -- ingest_raw_data loaded 113,371
+    rows across 6 tables with exact row-count parity (24/5,025/500/
+    25,000/74,859/12,963, matching the Postgres pipeline exactly),
+    dbt_run built 20/20 models, dbt_test passed 50/50 tests. See
+    ../README.md's "Status" section and
+    ../../results/snowflake_dag_run_output.txt for the real task logs.
 """
 from __future__ import annotations
 
@@ -85,9 +91,10 @@ def _dbt_env_for_connection(conn) -> dict:
         }
 
     if conn.conn_type == "snowflake":
-        # Prepared for the migration; not exercised against a real
-        # Snowflake account yet. Airflow's Snowflake connection type
-        # typically carries account/warehouse/role/database in `extra`.
+        # Verified end to end against a real Snowflake trial account,
+        # through this DAG itself (see module docstring). Airflow's
+        # Snowflake connection type typically carries account/warehouse/
+        # role/database in `extra`.
         return {
             "DBT_SF_ACCOUNT": extra.get("account", conn.host or ""),
             "DBT_SF_USER": conn.login or "",
@@ -145,29 +152,47 @@ def _run_dbt(subcommand: str) -> None:
 
 def ingest_raw_data(**_context) -> None:
     """
-    Load the source CSVs into the `raw` schema. Postgres-only today (see
-    module docstring) -- this task assumes warehouse_conn is a Postgres
-    connection and raises clearly if it isn't.
+    Load the source CSVs into the `raw` schema. Dispatches on
+    warehouse_conn's conn_type -- Postgres uses psycopg2's COPY FROM
+    STDIN (scripts/load_raw.py), Snowflake uses PUT + COPY INTO
+    (scripts/load_raw_snowflake.py), since Snowflake has no COPY FROM
+    STDIN equivalent. See module docstring for verification status.
     """
     conn = BaseHook.get_connection(WAREHOUSE_CONN_ID)
-    if conn.conn_type not in ("postgres", "postgresql"):
-        raise NotImplementedError(
-            f"ingest_raw_data only supports Postgres today; warehouse_conn "
-            f"is conn_type={conn.conn_type!r}. Rework this task (not just "
-            "its config) as part of the Snowflake migration -- Snowflake "
-            "ingestion is PUT + COPY INTO, a different mechanism from "
-            "psycopg2's COPY, not a connection-string swap."
-        )
 
     if SCRIPTS_DIR not in sys.path:
         sys.path.insert(0, SCRIPTS_DIR)
-    import load_raw  # noqa: E402  (path inserted just above, at call time)
 
-    conn_str = (
-        f"postgresql://{conn.login}:{conn.password}@{conn.host}:"
-        f"{conn.port or 5432}/{conn.schema}"
+    if conn.conn_type in ("postgres", "postgresql"):
+        import load_raw  # noqa: E402  (path inserted just above, at call time)
+
+        conn_str = (
+            f"postgresql://{conn.login}:{conn.password}@{conn.host}:"
+            f"{conn.port or 5432}/{conn.schema}"
+        )
+        load_raw.load(conn_str)
+        return
+
+    if conn.conn_type == "snowflake":
+        import load_raw_snowflake  # noqa: E402
+
+        extra = conn.extra_dejson or {}
+        load_raw_snowflake.load(
+            account=extra.get("account", conn.host or ""),
+            user=conn.login or "",
+            password=conn.password or "",
+            role=extra.get("role", ""),
+            database=extra.get("database", conn.schema or ""),
+            warehouse=extra.get("warehouse", ""),
+            schema=extra.get("raw_schema", "raw"),
+        )
+        return
+
+    raise AirflowException(
+        f"ingest_raw_data has no loader for conn_type={conn.conn_type!r}. "
+        "Add one (mirroring load_raw.py / load_raw_snowflake.py) before "
+        "pointing warehouse_conn at it."
     )
-    load_raw.load(conn_str)
 
 
 def dbt_run(**_context) -> None:

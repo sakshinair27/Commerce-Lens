@@ -10,28 +10,31 @@
 # stays as the plain, human-oriented template for local/manual dbt use
 # documented in the README. This file is the automation-facing one.
 #
-# Status: the `dev` (Postgres) target is what the Airflow DAG runs
-# against today. The `snowflake` target has now been run for real --
-# `dbt run && dbt test` against an actual Snowflake trial account,
-# 20/20 models and 50/50 tests passing, output captured in
-# ../results/dbt_snowflake_verification_output.txt. Three Postgres-only
-# SQL constructs needed real fixes to get there: `generate_series` (no
-# Snowflake equivalent -- replaced with a GENERATOR()-based date spine),
-# the `~` regex operator (Snowflake uses RLIKE -- added the
-# `regex_match()` macro in macros/cross_db_regex_match.sql to dispatch on
-# `target.type`), and `DISTINCT ON` (not supported in Snowflake --
-# replaced with QUALIFY + ROW_NUMBER() there). All three are
-# target-conditional in the model SQL, so the Postgres path is byte-for-
-# byte unchanged from what was already verified.
+# Status: both targets have been run for real, standalone AND through
+# the Airflow DAG (airflow/dags/commercelens_dag.py). The `snowflake`
+# target first ran standalone -- `dbt run && dbt test` against an actual
+# Snowflake trial account, 20/20 models and 50/50 tests passing, output
+# captured in ../results/dbt_snowflake_verification_output.txt. Three
+# Postgres-only SQL constructs needed real fixes to get there:
+# `generate_series` (no Snowflake equivalent -- replaced with a
+# GENERATOR()-based date spine), the `~` regex operator (Snowflake uses
+# RLIKE -- added the `regex_match()` macro in
+# macros/cross_db_regex_match.sql to dispatch on `target.type`), and
+# `DISTINCT ON` (not supported in Snowflake -- replaced with QUALIFY +
+# ROW_NUMBER() there). All three are target-conditional in the model
+# SQL, so the Postgres path is byte-for-byte unchanged from what was
+# already verified.
 #
-# One real scope boundary this did NOT close: the run above loaded the
-# raw CSVs into Snowflake by hand (Snowflake's own upload wizard), not
-# through the Airflow DAG's ingest_raw_data task, which is still
-# Postgres-only (see commercelens_dag.py's module docstring). So: the
-# dbt transformation layer is verified on Snowflake; a full Airflow-
-# orchestrated Snowflake run still needs that ingestion task reworked
-# for PUT + COPY INTO. Don't claim the orchestrated DAG itself runs on
-# Snowflake -- only that dbt does, independent of Airflow.
+# That first Snowflake pass loaded the raw CSVs by hand (Snowflake's own
+# upload wizard), not through the Airflow DAG's ingest_raw_data task,
+# which was still Postgres-only at that point. That gap is closed:
+# ingest_raw_data now dispatches on the Airflow connection's conn_type,
+# using scripts/load_raw_snowflake.py (PUT + COPY INTO) for Snowflake.
+# The full DAG -- ingest_raw_data -> dbt_run -> dbt_test -- has since
+# been triggered end to end against the same live Snowflake trial
+# account, all three tasks succeeding (113,371 rows ingested with exact
+# row-count parity, 20/20 models, 50/50 tests). Full task logs in
+# ../results/snowflake_dag_run_output.txt.
 
 commercelens:
   target: "{{ env_var('DBT_TARGET', 'dev') }}"
@@ -48,8 +51,8 @@ commercelens:
       schema: "{{ env_var('DBT_PG_SCHEMA', 'dbt_dev') }}"
       threads: 4
 
-    # Snowflake -- real, verified via a manual dbt run (see status note
-    # above). Not yet wired through the Airflow DAG end to end.
+    # Snowflake -- real, verified standalone and through the Airflow
+    # DAG end to end (see status note above).
     snowflake:
       type: snowflake
       account: "{{ env_var('DBT_SF_ACCOUNT') }}"
